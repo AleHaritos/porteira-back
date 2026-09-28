@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    volumes:
+      - db_data:/var/lib/postgres
+    environment:
+      - 'POSTGRES_DB=glsdb'
+      - 'POSTGRES_PASSWORD=123456'
+      - 'POSTGRES_USER=gls'
+    ports:
+      - "5434:5432"
+volumes:
+  db_data: {}

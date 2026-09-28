@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: fazenda-losardo
+  datasource:
+    url: jdbc:postgresql://localhost:5434/glsdb
+    username: gls
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+app:
+  jwt:
+    secret: ${JWT_SECRET:uma-chave-bem-grande-e-aleatoria-com-pelo-menos-32-caracteres}
+
