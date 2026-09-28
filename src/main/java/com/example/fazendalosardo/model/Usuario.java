@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "usuarios")
 @NoArgsConstructor
@@ -31,5 +34,11 @@ public class Usuario {
 
     @Column(name = "admin")
     private Boolean admin = false;
+
+    @OneToMany(mappedBy = "dono")
+    private List<Fazenda> fazendas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "colaborador")
+    private List<FazendaColaborador> participacoes = new ArrayList<>();
 
 }
