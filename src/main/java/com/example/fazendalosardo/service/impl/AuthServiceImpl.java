@@ -1,4 +1,3 @@
-// service/impl/AuthServiceImpl.java
 package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.LoginRequest;
