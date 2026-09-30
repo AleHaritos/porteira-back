@@ -8,6 +8,9 @@ import com.example.fazendalosardo.dto.FazendaResumoResponse;
 import com.example.fazendalosardo.service.FazendaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +39,10 @@ public class FazendaController {
 
     @GetMapping("/listarFazendas")
     @ResponseStatus(HttpStatus.OK)
-    public List<FazendaResumoResponse> buscarFazendaPorColaborador(Authentication authentication) {
-        return fazendaService.buscarFazendasPorColaborador(authentication.getName());
+    public Page<FazendaResumoResponse> minhasFazendas(
+            Authentication authentication,
+            @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return fazendaService.buscarFazendasPorColaborador(authentication.getName(), pageable);
     }
 
     @PostMapping("/{fazendaId}/colaboradores")

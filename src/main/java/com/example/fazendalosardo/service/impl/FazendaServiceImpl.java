@@ -15,6 +15,8 @@ import com.example.fazendalosardo.repository.FazendaRepository;
 import com.example.fazendalosardo.repository.UsuarioRepository;
 import com.example.fazendalosardo.service.FazendaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,18 +102,17 @@ public class FazendaServiceImpl implements FazendaService {
         return fazendaMapper.toResponse(fazenda, colaboradores);
     }
 
+    // service/impl/FazendaServiceImpl.java
     @Override
     @Transactional(readOnly = true)
-    public List<FazendaResumoResponse> buscarFazendasPorColaborador(String numero) {
+    public Page<FazendaResumoResponse> buscarFazendasPorColaborador(String numero, Pageable pageable) {
 
         Usuario usuario = usuarioRepository.findByNumero(numero)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
 
-        return fazendaColaboradorRepository.findByColaboradorId(usuario.getId())
-                .stream()
-                .map(FazendaColaborador::getFazenda)
-                .map(fazendaMapper::toResumoResponse)
-                .toList();
+        return fazendaRepository
+                .buscarPorColaborador(usuario.getId(), pageable)
+                .map(fazendaMapper::toResumoResponse);   // Page também tem .map(), converte item por item
     }
 
     @Override

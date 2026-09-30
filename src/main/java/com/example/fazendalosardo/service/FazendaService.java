@@ -3,6 +3,8 @@ package com.example.fazendalosardo.service;
 import com.example.fazendalosardo.dto.FazendaRequest;
 import com.example.fazendalosardo.dto.FazendaResponse;
 import com.example.fazendalosardo.dto.FazendaResumoResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,7 +14,7 @@ public interface FazendaService {
 
     FazendaResponse buscarPorId(Long id);
 
-    List<FazendaResumoResponse> buscarFazendasPorColaborador(String numero);
+    Page<FazendaResumoResponse> buscarFazendasPorColaborador(String numero, Pageable pageable);
 
     void removerColaborador(Long fazendaId, Long usuarioId);
 
