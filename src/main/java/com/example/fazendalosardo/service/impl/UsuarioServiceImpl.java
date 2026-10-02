@@ -35,6 +35,11 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new BusinessException("Apenas administradores podem cadastrar usuários");
         }
 
+        boolean usuarioExiste = usuarioRepository.existsByNumero(request.numero());
+        if (usuarioExiste) {
+            throw new BusinessException("O número de usuario já está cadastrado!");
+        }
+
         Usuario novoUsuario = usuarioMapper.toEntity(request);
         novoUsuario.setCadastradoPor(admin);
 

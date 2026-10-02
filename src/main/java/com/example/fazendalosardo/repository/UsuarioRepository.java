@@ -14,4 +14,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByNumero(String numero);
 
     Page<Usuario> findByCadastradoPorId(Long adminId, Pageable pageable);
+
+    Boolean existsByNumero(String numero);
 }
