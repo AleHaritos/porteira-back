@@ -10,7 +10,9 @@ import org.mapstruct.Mapping;
 public interface UsuarioMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "admin", ignore = true)
+    @Mapping(target = "senha", ignore = true)
+    @Mapping(target = "ativo", ignore = true)
+    @Mapping(target = "cadastradoPor", ignore = true)
     Usuario toEntity(UsuarioRequest request);
 
     UsuarioResponse toResponse(Usuario usuario);

@@ -4,6 +4,7 @@ public record UsuarioResponse(
         Long id,
         String nome,
         String numero,
-        Boolean admin
+        Boolean admin,
+        Boolean ativo
 ) {
 }

@@ -2,10 +2,7 @@ package com.example.fazendalosardo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(of = "id")
 public class Usuario {
 
     @Id
@@ -34,6 +32,13 @@ public class Usuario {
 
     @Column(name = "admin")
     private Boolean admin = false;
+
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cadastrado_por")
+    private Usuario cadastradoPor;
 
     @OneToMany(mappedBy = "dono")
     private List<Fazenda> fazendas = new ArrayList<>();
