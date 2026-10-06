@@ -16,14 +16,12 @@ public interface SafraRepository extends JpaRepository<Safra, Long> {
         SELECT s FROM Safra s
         WHERE s.fazenda.id = :fazendaId
         AND s.status <> :statusExcluido
-        AND (:dataInicioDe IS NULL OR s.dataInicio >= :dataInicioDe)
-        AND (:dataInicioAte IS NULL OR s.dataInicio <= :dataInicioAte)
+        AND (:anoAgricola IS NULL OR s.anoAgricola LIKE %:anoAgricola%)
         """)
     Page<Safra> buscarPorFazenda(
             @Param("fazendaId") Long fazendaId,
             @Param("statusExcluido") StatusSafra statusExcluido,
-            @Param("dataInicioDe") LocalDate dataInicioDe,
-            @Param("dataInicioAte") LocalDate dataInicioAte,
+            @Param("anoAgricola") String anoAgricola,
             Pageable pageable
     );
 }

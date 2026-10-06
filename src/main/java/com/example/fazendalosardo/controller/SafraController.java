@@ -30,9 +30,8 @@ public class SafraController {
     @GetMapping("/{fazendaId}")
     public Page<SafraResponse> buscarPorFazenda(
             @PathVariable Long fazendaId,
-            @RequestParam(required = false) LocalDate dataInicioDe,
-            @RequestParam(required = false) LocalDate dataInicioAte,
-            @PageableDefault(size = 10, sort = "dataInicio") Pageable pageable) {
-        return safraService.buscarPorFazenda(fazendaId, dataInicioDe, dataInicioAte, pageable);
+            @RequestParam(required = false) String anoAgricola,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
+        return safraService.buscarPorFazenda(fazendaId, anoAgricola, pageable);
     }
 }

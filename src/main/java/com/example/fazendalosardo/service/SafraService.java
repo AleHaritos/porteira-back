@@ -11,7 +11,7 @@ public interface SafraService {
 
     SafraResponse salvar(SafraRequest request);
 
-    Page<SafraResponse> buscarPorFazenda(Long fazendaId, LocalDate dataInicioDe, LocalDate dataInicioAte, Pageable pageable);
+    Page<SafraResponse> buscarPorFazenda(Long fazendaId, String anoAgricola, Pageable pageable);
 
 
 }

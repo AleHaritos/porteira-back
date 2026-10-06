@@ -10,8 +10,6 @@ public record SafraResponse(
         String nome,
         String cultura,
         String anoAgricola,
-        LocalDate dataInicio,
-        LocalDate previsaoFim,
         StatusSafra status,
         BigDecimal areaTotal,
         String observacoes,

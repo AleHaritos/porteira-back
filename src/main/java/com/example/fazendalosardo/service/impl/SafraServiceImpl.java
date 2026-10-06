@@ -44,9 +44,9 @@ public class SafraServiceImpl implements SafraService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<SafraResponse> buscarPorFazenda(Long fazendaId, LocalDate dataInicioDe, LocalDate dataInicioAte, Pageable pageable) {
+    public Page<SafraResponse> buscarPorFazenda(Long fazendaId, String anoAgricola, Pageable pageable) {
         return safraRepository
-                .buscarPorFazenda(fazendaId, StatusSafra.ENCERRADO, dataInicioDe, dataInicioAte, pageable)
+                .buscarPorFazenda(fazendaId, StatusSafra.ENCERRADO, anoAgricola, pageable)
                 .map(safraMapper::toResponse);
     }
 }

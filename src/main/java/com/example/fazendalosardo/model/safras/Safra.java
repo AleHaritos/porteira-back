@@ -37,13 +37,6 @@ public class Safra {
     private String anoAgricola;
 
     @NotNull
-    @Column(name = "data_inicio", nullable = false)
-    private LocalDate dataInicio;
-
-    @Column(name = "previsao_fim")
-    private LocalDate previsaoFim;
-
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private StatusSafra status = StatusSafra.PLANEJAMENTO;

@@ -12,8 +12,6 @@ public record SafraRequest(
         @NotBlank String nome,
         @NotBlank String cultura,
         @NotBlank String anoAgricola,
-        @NotNull LocalDate dataInicio,
-        LocalDate previsaoFim,
         StatusSafra status,
         @NotNull @Positive BigDecimal areaTotal,
         String observacoes,
