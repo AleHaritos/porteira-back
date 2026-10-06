@@ -1,12 +1,10 @@
 package com.example.fazendalosardo.service;
 
-import com.example.fazendalosardo.dto.FazendaRequest;
-import com.example.fazendalosardo.dto.FazendaResponse;
-import com.example.fazendalosardo.dto.FazendaResumoResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface FazendaService {
 

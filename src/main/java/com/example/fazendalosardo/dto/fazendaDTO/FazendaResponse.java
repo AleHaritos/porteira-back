@@ -1,4 +1,6 @@
-package com.example.fazendalosardo.dto;
+package com.example.fazendalosardo.dto.fazendaDTO;
+
+import com.example.fazendalosardo.dto.UsuarioDTO;
 
 import java.math.BigDecimal;
 import java.util.List;

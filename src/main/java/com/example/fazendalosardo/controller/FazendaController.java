@@ -1,10 +1,10 @@
 package com.example.fazendalosardo.controller;
 
 
-import com.example.fazendalosardo.dto.AdicionarColaboradorRequest;
-import com.example.fazendalosardo.dto.FazendaRequest;
-import com.example.fazendalosardo.dto.FazendaResponse;
-import com.example.fazendalosardo.dto.FazendaResumoResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.AdicionarColaboradorRequest;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
 import com.example.fazendalosardo.service.FazendaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/fazenda")

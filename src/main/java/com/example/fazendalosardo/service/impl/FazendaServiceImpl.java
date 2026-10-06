@@ -1,8 +1,8 @@
 package com.example.fazendalosardo.service.impl;
 
-import com.example.fazendalosardo.dto.FazendaRequest;
-import com.example.fazendalosardo.dto.FazendaResponse;
-import com.example.fazendalosardo.dto.FazendaResumoResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
 import com.example.fazendalosardo.dto.UsuarioDTO;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

@@ -1,8 +1,8 @@
 package com.example.fazendalosardo.mapper;
 
-import com.example.fazendalosardo.dto.FazendaRequest;
-import com.example.fazendalosardo.dto.FazendaResponse;
-import com.example.fazendalosardo.dto.FazendaResumoResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
 import com.example.fazendalosardo.dto.UsuarioDTO;
 import com.example.fazendalosardo.model.Fazenda;
 import com.example.fazendalosardo.model.Usuario;

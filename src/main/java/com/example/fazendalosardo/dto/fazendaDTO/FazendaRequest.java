@@ -1,4 +1,4 @@
-package com.example.fazendalosardo.dto;
+package com.example.fazendalosardo.dto.fazendaDTO;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
