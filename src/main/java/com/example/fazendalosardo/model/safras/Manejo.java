@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -34,6 +35,9 @@ public class Manejo {
 
     @Column(name = "observacoes", length = 500)
     private String observacoes;
+
+    @Column(name = "quantidade_produto", precision = 10, scale = 2)
+    private BigDecimal quantidadeProduto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "talhao_id", nullable = false)
