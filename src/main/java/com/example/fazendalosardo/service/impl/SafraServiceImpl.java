@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.safraDTO.SafraRequest;
 import com.example.fazendalosardo.dto.safraDTO.SafraResponse;
+import com.example.fazendalosardo.dto.safraDTO.SafraUpdateRequest;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.mapper.SafraMapper;
 import com.example.fazendalosardo.model.Fazenda;
@@ -48,5 +49,17 @@ public class SafraServiceImpl implements SafraService {
         return safraRepository
                 .buscarPorFazenda(fazendaId, StatusSafra.ENCERRADO, anoAgricola, pageable)
                 .map(safraMapper::toResponse);
+    }
+
+
+    @Override
+    @Transactional
+    public SafraResponse atualizar(Long id, SafraUpdateRequest request) {
+        Safra safra = safraRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Safra não encontrada"));
+
+        safraMapper.atualizar(request, safra);
+
+        return safraMapper.toResponse(safraRepository.save(safra));
     }
 }

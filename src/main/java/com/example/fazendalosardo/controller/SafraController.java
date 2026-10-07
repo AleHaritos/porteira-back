@@ -3,6 +3,7 @@ package com.example.fazendalosardo.controller;
 
 import com.example.fazendalosardo.dto.safraDTO.SafraRequest;
 import com.example.fazendalosardo.dto.safraDTO.SafraResponse;
+import com.example.fazendalosardo.dto.safraDTO.SafraUpdateRequest;
 import com.example.fazendalosardo.service.SafraService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -33,5 +35,13 @@ public class SafraController {
             @RequestParam(required = false) String anoAgricola,
             @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
         return safraService.buscarPorFazenda(fazendaId, anoAgricola, pageable);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<SafraResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid SafraUpdateRequest request
+    ) {
+        return ResponseEntity.ok(safraService.atualizar(id, request));
     }
 }

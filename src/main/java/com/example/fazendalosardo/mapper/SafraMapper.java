@@ -2,9 +2,11 @@ package com.example.fazendalosardo.mapper;
 
 import com.example.fazendalosardo.dto.safraDTO.SafraRequest;
 import com.example.fazendalosardo.dto.safraDTO.SafraResponse;
+import com.example.fazendalosardo.dto.safraDTO.SafraUpdateRequest;
 import com.example.fazendalosardo.model.safras.Safra;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface SafraMapper {
@@ -17,4 +19,7 @@ public interface SafraMapper {
     @Mapping(target = "fazendaNome", source = "fazenda.nome")
     SafraResponse toResponse(Safra safra);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "fazenda", ignore = true)
+    void atualizar(SafraUpdateRequest request, @MappingTarget Safra safra);
 }
