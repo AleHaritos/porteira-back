@@ -57,6 +57,17 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public List<UsuarioResponse> listarTodosMeusCadastros(String numeroUsuarioLogado) {
+        Usuario usuarioLogado = usuarioRepository.findByNumero(numeroUsuarioLogado)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
+
+        return usuarioRepository.findByCadastradoPorIdOrderByNomeAsc(usuarioLogado.getId())
+                .stream()
+                .map(usuarioMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     public Boolean verificacaoUsuario(String numero) {
         Usuario usuario = usuarioRepository.findByNumero(numero)
                 .orElseThrow(() -> new NotFoundException("Usuário não encontrado"));

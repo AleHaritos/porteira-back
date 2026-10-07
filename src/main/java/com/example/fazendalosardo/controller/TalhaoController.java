@@ -2,6 +2,7 @@ package com.example.fazendalosardo.controller;
 
 import com.example.fazendalosardo.dto.safraDTO.TalhaoRequest;
 import com.example.fazendalosardo.dto.safraDTO.TalhaoResponse;
+import com.example.fazendalosardo.dto.safraDTO.TalhaoUpdateRequest;
 import com.example.fazendalosardo.service.TalhaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,13 @@ public class TalhaoController {
     public ResponseEntity<Void> reativar(@PathVariable Long id) {
         talhaoService.reativar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TalhaoResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid TalhaoUpdateRequest request
+    ) {
+        return ResponseEntity.ok(talhaoService.atualizar(id, request));
     }
 }

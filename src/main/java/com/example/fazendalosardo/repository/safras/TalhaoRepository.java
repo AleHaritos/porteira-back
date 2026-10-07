@@ -17,4 +17,7 @@ public interface TalhaoRepository extends JpaRepository<Talhao, Long> {
 
     @Query("SELECT COALESCE(SUM(t.areaHectares), 0) FROM Talhao t WHERE t.safra.id = :safraId")
     BigDecimal somarAreaPorSafra(@Param("safraId") Long safraId);
+
+    @Query("SELECT COALESCE(SUM(t.areaHectares), 0) FROM Talhao t WHERE t.safra.id = :safraId AND t.id <> :talhaoId")
+    BigDecimal somarAreaPorSafraExcluindoTalhao(@Param("safraId") Long safraId, @Param("talhaoId") Long talhaoId);
 }

@@ -3,6 +3,7 @@ package com.example.fazendalosardo.service;
 import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
 import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
 import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,4 +18,10 @@ public interface FazendaService {
     void removerColaborador(Long fazendaId, Long usuarioId);
 
     void adicionarColaborador(Long fazendaId, String numeroColaborador, String numeroUsuarioLogado);
+
+    FazendaResponse atualizar(Long id, FazendaUpdateRequest request, String numeroUsuarioLogado);
+
+    void desativar(Long id, String numeroUsuarioLogado);
+
+    void reativar(Long id, String numeroUsuarioLogado);
 }

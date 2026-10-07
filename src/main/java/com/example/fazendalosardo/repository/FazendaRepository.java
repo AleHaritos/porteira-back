@@ -10,10 +10,20 @@ import org.springframework.data.repository.query.Param;
 public interface FazendaRepository extends JpaRepository<Fazenda, Long> {
 
     @Query("""
-    SELECT f FROM Fazenda f
-    WHERE f.id IN (
-        SELECT fc.fazenda.id FROM FazendaColaborador fc WHERE fc.colaborador.id = :usuarioId
-    )
-""")
+                SELECT f FROM Fazenda f
+                WHERE f.ativo = true
+                AND f.id IN (
+                    SELECT fc.fazenda.id FROM FazendaColaborador fc WHERE fc.colaborador.id = :usuarioId
+                )
+            """)
     Page<Fazenda> buscarPorColaborador(@Param("usuarioId") Long usuarioId, Pageable pageable);
+
+    @Query("""
+            SELECT f FROM Fazenda f
+            WHERE f.ativo = false
+            AND f.id IN (
+                SELECT fc.fazenda.id FROM FazendaColaborador fc WHERE fc.colaborador.id = :usuarioId
+            )
+            """)
+    Page<Fazenda> buscarInativasPorColaborador(@Param("usuarioId") Long usuarioId, Pageable pageable);
 }

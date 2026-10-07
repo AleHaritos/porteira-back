@@ -4,6 +4,7 @@ import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
 import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
 import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
 import com.example.fazendalosardo.dto.UsuarioDTO;
+import com.example.fazendalosardo.dto.fazendaDTO.FazendaUpdateRequest;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.mapper.FazendaMapper;
@@ -85,6 +86,21 @@ public class FazendaServiceImpl implements FazendaService {
     }
 
     @Override
+    @Transactional
+    public FazendaResponse atualizar(Long id, FazendaUpdateRequest request, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Fazenda não encontrada"));
+
+        if (!fazenda.getDono().getNumero().equals(numeroUsuarioLogado)) {
+            throw new BusinessException("Apenas o dono da fazenda pode editar seus dados");
+        }
+
+        fazendaMapper.atualizar(request, fazenda);
+
+        return fazendaMapper.toResponse(fazendaRepository.save(fazenda), List.of());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public FazendaResponse buscarPorId(Long id) {
         Fazenda fazenda = fazendaRepository.findById(id)
@@ -129,6 +145,34 @@ public class FazendaServiceImpl implements FazendaService {
         }
 
         fazendaColaboradorRepository.deleteByFazendaIdAndColaboradorId(fazendaId, usuarioId);
+    }
+
+    @Override
+    @Transactional
+    public void desativar(Long id, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Fazenda não encontrada"));
+
+        if (!fazenda.getDono().getNumero().equals(numeroUsuarioLogado)) {
+            throw new BusinessException("Apenas o dono da fazenda pode desativá-la");
+        }
+
+        fazenda.setAtivo(false);
+        fazendaRepository.save(fazenda);
+    }
+
+    @Override
+    @Transactional
+    public void reativar(Long id, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Fazenda não encontrada"));
+
+        if (!fazenda.getDono().getNumero().equals(numeroUsuarioLogado)) {
+            throw new BusinessException("Apenas o dono da fazenda pode reativá-la");
+        }
+
+        fazenda.setAtivo(true);
+        fazendaRepository.save(fazenda);
     }
 
 }

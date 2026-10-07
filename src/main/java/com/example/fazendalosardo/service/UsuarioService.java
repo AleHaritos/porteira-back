@@ -23,4 +23,6 @@ public interface UsuarioService {
     Page<UsuarioResponse> buscarUsuariosCadastradosPor(String numeroAdminLogado, Pageable pageable);
 
     void reativarUsuario(Long usuarioId, String numeroAdminLogado);
+
+    List<UsuarioResponse> listarTodosMeusCadastros(String numeroUsuarioLogado);
 }

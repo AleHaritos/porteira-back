@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service;
 
 import com.example.fazendalosardo.dto.safraDTO.TalhaoRequest;
 import com.example.fazendalosardo.dto.safraDTO.TalhaoResponse;
+import com.example.fazendalosardo.dto.safraDTO.TalhaoUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,4 +14,5 @@ public interface TalhaoService {
     List<TalhaoResponse> listarPorSafra(Long safraId);
     void desativar(Long id);
     void reativar(Long id);
+    TalhaoResponse atualizar(Long id, TalhaoUpdateRequest request);
 }

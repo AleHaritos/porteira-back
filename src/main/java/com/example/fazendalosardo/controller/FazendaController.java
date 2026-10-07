@@ -1,10 +1,7 @@
 package com.example.fazendalosardo.controller;
 
 
-import com.example.fazendalosardo.dto.fazendaDTO.AdicionarColaboradorRequest;
-import com.example.fazendalosardo.dto.fazendaDTO.FazendaRequest;
-import com.example.fazendalosardo.dto.fazendaDTO.FazendaResponse;
-import com.example.fazendalosardo.dto.fazendaDTO.FazendaResumoResponse;
+import com.example.fazendalosardo.dto.fazendaDTO.*;
 import com.example.fazendalosardo.service.FazendaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +55,27 @@ public class FazendaController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removerColaborador(@PathVariable Long fazendaId, @PathVariable Long usuarioId) {
         fazendaService.removerColaborador(fazendaId, usuarioId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<FazendaResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid FazendaUpdateRequest request,
+            Authentication authentication
+    ) {
+        return ResponseEntity.ok(fazendaService.atualizar(id, request, authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/desativar")
+    public ResponseEntity<Void> desativar(@PathVariable Long id, Authentication authentication) {
+        fazendaService.desativar(id, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<Void> reativar(@PathVariable Long id, Authentication authentication) {
+        fazendaService.reativar(id, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 
 }

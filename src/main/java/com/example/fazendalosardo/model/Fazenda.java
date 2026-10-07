@@ -40,6 +40,9 @@ public class Fazenda {
     @JoinColumn(name = "usuario_dono", nullable = false)
     private Usuario dono;
 
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private Boolean ativo = true;
+
     @OneToMany(mappedBy = "fazenda", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FazendaColaborador> colaboradores = new ArrayList<>();
 }

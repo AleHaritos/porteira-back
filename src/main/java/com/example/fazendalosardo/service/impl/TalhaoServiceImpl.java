@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.safraDTO.TalhaoRequest;
 import com.example.fazendalosardo.dto.safraDTO.TalhaoResponse;
+import com.example.fazendalosardo.dto.safraDTO.TalhaoUpdateRequest;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.mapper.TalhaoMapper;
@@ -85,5 +86,29 @@ public class TalhaoServiceImpl implements TalhaoService {
                 .orElseThrow(() -> new NotFoundException("Talhão não encontrado"));
         talhao.setAtivo(true);
         talhaoRepository.save(talhao);
+    }
+
+    @Override
+    @Transactional
+    public TalhaoResponse atualizar(Long id, TalhaoUpdateRequest request) {
+        Talhao talhao = talhaoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Talhão não encontrado"));
+
+        BigDecimal somaOutrosTalhoes = talhaoRepository.somarAreaPorSafraExcluindoTalhao(
+                talhao.getSafra().getId(), talhao.getId()
+        );
+
+        BigDecimal novaSoma = somaOutrosTalhoes.add(request.areaHectares());
+
+        if (novaSoma.compareTo(talhao.getSafra().getAreaTotal()) > 0) {
+            throw new BusinessException(
+                    "A soma das áreas dos talhões não pode exceder a área total da safra (%s ha)"
+                            .formatted(talhao.getSafra().getAreaTotal())
+            );
+        }
+
+        talhaoMapper.atualizar(request, talhao);
+
+        return talhaoMapper.toResponse(talhaoRepository.save(talhao));
     }
 }

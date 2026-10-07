@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import com.example.fazendalosardo.service.UsuarioService;
@@ -65,6 +66,11 @@ public class UsuarioController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void reativar(@PathVariable Long id, Authentication authentication) {
         usuarioService.reativarUsuario(id, authentication.getName());
+    }
+
+    @GetMapping("/meus-cadastros/todos")
+    public ResponseEntity<List<UsuarioResponse>> listarTodosMeusCadastros(Authentication authentication) {
+        return ResponseEntity.ok(usuarioService.listarTodosMeusCadastros(authentication.getName()));
     }
 
 }
