@@ -3,6 +3,7 @@ package com.example.fazendalosardo.controller;
 
 import com.example.fazendalosardo.dto.safraDTO.ProdutoSafraRequest;
 import com.example.fazendalosardo.dto.safraDTO.ProdutoSafraResponse;
+import com.example.fazendalosardo.dto.safraDTO.ProdutoSafraUpdateRequest;
 import com.example.fazendalosardo.service.ProdutoSafraService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +39,19 @@ public class ProdutoSafraController {
     @GetMapping("/safra/{safraId}/todos")
     public List<ProdutoSafraResponse> listarPorSafra(@PathVariable Long safraId) {
         return produtoSafraService.listarPorSafra(safraId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoSafraResponse> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid ProdutoSafraUpdateRequest request
+    ) {
+        return ResponseEntity.ok(produtoSafraService.atualizar(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        produtoSafraService.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 }

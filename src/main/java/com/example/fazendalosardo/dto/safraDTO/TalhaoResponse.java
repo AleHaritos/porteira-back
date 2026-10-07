@@ -8,6 +8,7 @@ public record TalhaoResponse(
         BigDecimal areaHectares,
         String localizacao,
         String observacao,
+        Boolean ativo,
         Long safraId,
         String safraNome
 ) {

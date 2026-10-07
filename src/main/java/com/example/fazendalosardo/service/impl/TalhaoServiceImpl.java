@@ -63,9 +63,27 @@ public class TalhaoServiceImpl implements TalhaoService {
     @Override
     @Transactional(readOnly = true)
     public List<TalhaoResponse> listarPorSafra(Long safraId) {
-        return talhaoRepository.findBySafraId(safraId)
+        return talhaoRepository.findBySafraIdAndAtivoTrueOrderByNomeAsc(safraId)
                 .stream()
                 .map(talhaoMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void desativar(Long id) {
+        Talhao talhao = talhaoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Talhão não encontrado"));
+        talhao.setAtivo(false);
+        talhaoRepository.save(talhao);
+    }
+
+    @Override
+    @Transactional
+    public void reativar(Long id) {
+        Talhao talhao = talhaoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Talhão não encontrado"));
+        talhao.setAtivo(true);
+        talhaoRepository.save(talhao);
     }
 }

@@ -12,7 +12,8 @@ import java.util.List;
 
 public interface TalhaoRepository extends JpaRepository<Talhao, Long> {
     Page<Talhao> findBySafraId(Long safraId, Pageable pageable);
-    List<Talhao> findBySafraId(Long safraId);
+
+    List<Talhao> findBySafraIdAndAtivoTrueOrderByNomeAsc(Long safraId);
 
     @Query("SELECT COALESCE(SUM(t.areaHectares), 0) FROM Talhao t WHERE t.safra.id = :safraId")
     BigDecimal somarAreaPorSafra(@Param("safraId") Long safraId);

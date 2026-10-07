@@ -36,6 +36,9 @@ public class Talhao {
     @Column(name = "observacao", length = 500)
     private String observacao;
 
+    @Column(nullable = false)
+    private Boolean ativo = true;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "safra_id", nullable = false)
     private Safra safra;

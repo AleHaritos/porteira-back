@@ -8,6 +8,8 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface TalhaoMapper {
+
+    @Mapping(target = "ativo", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "safra", ignore = true)
     Talhao toEntity(TalhaoRequest request);

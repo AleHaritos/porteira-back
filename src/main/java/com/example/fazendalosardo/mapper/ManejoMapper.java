@@ -2,9 +2,11 @@ package com.example.fazendalosardo.mapper;
 
 import com.example.fazendalosardo.dto.safraDTO.ManejoRequest;
 import com.example.fazendalosardo.dto.safraDTO.ManejoResponse;
+import com.example.fazendalosardo.dto.safraDTO.ManejoUpdateRequest;
 import com.example.fazendalosardo.model.safras.Manejo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
 
@@ -22,6 +24,11 @@ public interface ManejoMapper {
     @Mapping(target = "produtoSafraNome", source = "produtoSafra.nome")
     @Mapping(target = "custoTotal", expression = "java(calcularCustoTotal(manejo))")
     ManejoResponse toResponse(Manejo manejo);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "talhao", ignore = true)
+    @Mapping(target = "produtoSafra", ignore = true)
+    void atualizar(ManejoUpdateRequest request, @MappingTarget Manejo manejo);
 
     default BigDecimal calcularCustoTotal(Manejo manejo) {
         if (manejo.getProdutoSafra() == null || manejo.getQuantidadeProduto() == null) {

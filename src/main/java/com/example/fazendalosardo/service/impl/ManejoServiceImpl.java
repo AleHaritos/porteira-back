@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.safraDTO.ManejoRequest;
 import com.example.fazendalosardo.dto.safraDTO.ManejoResponse;
+import com.example.fazendalosardo.dto.safraDTO.ManejoUpdateRequest;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.mapper.ManejoMapper;
@@ -72,5 +73,42 @@ public class ManejoServiceImpl implements ManejoService {
         if (temProduto != temQuantidade) {
             throw new BusinessException("Produto e quantidade devem ser informados juntos");
         }
+    }
+
+    @Override
+    @Transactional
+    public ManejoResponse atualizar(Long id, ManejoUpdateRequest request) {
+        Manejo manejo = manejoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Manejo não encontrado"));
+
+        boolean temProduto = request.produtoSafraId() != null;
+        boolean temQuantidade = request.quantidadeProduto() != null;
+
+        if (temProduto != temQuantidade) {
+            throw new BusinessException("Produto e quantidade devem ser informados juntos ou nenhum dos dois");
+        }
+
+        manejoMapper.atualizar(request, manejo);
+
+        if (temProduto) {
+            ProdutoSafra produtoSafra = produtoSafraRepository.findById(request.produtoSafraId())
+                    .orElseThrow(() -> new NotFoundException("Produto não encontrado"));
+            manejo.setProdutoSafra(produtoSafra);
+            manejo.setQuantidadeProduto(request.quantidadeProduto());
+        } else {
+            manejo.setProdutoSafra(null);
+            manejo.setQuantidadeProduto(null);
+        }
+
+        return manejoMapper.toResponse(manejoRepository.save(manejo));
+    }
+
+    @Override
+    @Transactional
+    public void excluir(Long id) {
+        if (!manejoRepository.existsById(id)) {
+            throw new NotFoundException("Manejo não encontrado");
+        }
+        manejoRepository.deleteById(id);
     }
 }

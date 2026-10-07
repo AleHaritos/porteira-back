@@ -11,4 +11,6 @@ public interface TalhaoService {
     TalhaoResponse salvar(TalhaoRequest request);
     Page<TalhaoResponse> buscarPorSafra(Long safraId, Pageable pageable);
     List<TalhaoResponse> listarPorSafra(Long safraId);
+    void desativar(Long id);
+    void reativar(Long id);
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,5 +37,17 @@ public class TalhaoController {
     @GetMapping("/safra/{safraId}/todos")
     public List<TalhaoResponse> listarPorSafra(@PathVariable Long safraId) {
         return talhaoService.listarPorSafra(safraId);
+    }
+
+    @PatchMapping("/{id}/desativar")
+    public ResponseEntity<Void> desativar(@PathVariable Long id) {
+        talhaoService.desativar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<Void> reativar(@PathVariable Long id) {
+        talhaoService.reativar(id);
+        return ResponseEntity.noContent().build();
     }
 }
