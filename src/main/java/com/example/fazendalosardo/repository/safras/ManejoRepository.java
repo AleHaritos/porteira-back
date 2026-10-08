@@ -10,5 +10,4 @@ import java.util.List;
 public interface ManejoRepository extends JpaRepository<Manejo, Long> {
     Page<Manejo> findByTalhaoId(Long talhaoId, Pageable pageable);
     List<Manejo> findByTalhaoId(Long talhaoId);
-    boolean existsByProdutoSafraId(Long produtoSafraId);
 }

@@ -4,6 +4,7 @@ import com.example.fazendalosardo.model.enums.TipoManejo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record ManejoResponse(
         Long id,
@@ -16,6 +17,7 @@ public record ManejoResponse(
         Long produtoSafraId,
         String produtoSafraNome,
         BigDecimal quantidadeProduto,
+        List<ItemManejoResponse> itens,
         BigDecimal custoTotal
 ) {
 }

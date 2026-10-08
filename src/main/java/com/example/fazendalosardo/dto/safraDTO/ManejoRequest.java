@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 public record ManejoRequest(
         @NotNull TipoManejo tipo,
@@ -13,7 +14,6 @@ public record ManejoRequest(
         String descricao,
         String observacoes,
         @NotNull Long talhaoId,
-        Long produtoSafraId,
-        @Positive BigDecimal quantidadeProduto
+        List<ItemManejoRequest> itens
 ) {
 }

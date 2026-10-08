@@ -8,6 +8,7 @@ import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.mapper.ProdutoSafraMapper;
 import com.example.fazendalosardo.model.safras.ProdutoSafra;
 import com.example.fazendalosardo.model.safras.Safra;
+import com.example.fazendalosardo.repository.safras.ItemManejoRepository;
 import com.example.fazendalosardo.repository.safras.ManejoRepository;
 import com.example.fazendalosardo.repository.safras.ProdutoSafraRepository;
 import com.example.fazendalosardo.repository.safras.SafraRepository;
@@ -27,7 +28,7 @@ public class ProdutoSafraServiceImpl implements ProdutoSafraService {
 
     private final ProdutoSafraRepository produtoSafraRepository;
     private final SafraRepository safraRepository;
-    private final ManejoRepository manejoRepository;
+    private final ItemManejoRepository itemManejoRepository;
     private final ProdutoSafraMapper produtoSafraMapper;
 
     @Override
@@ -76,7 +77,7 @@ public class ProdutoSafraServiceImpl implements ProdutoSafraService {
             throw new NotFoundException("Produto não encontrado");
         }
 
-        if (manejoRepository.existsByProdutoSafraId(id)) {
+        if (itemManejoRepository.existsByProdutoSafraId(id)) {
             throw new BusinessException("Não é possível excluir um produto que já foi utilizado em manejos");
         }
 

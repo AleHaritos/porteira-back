@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "manejos")
@@ -36,14 +38,11 @@ public class Manejo {
     @Column(name = "observacoes", length = 500)
     private String observacoes;
 
-    @Column(name = "quantidade_produto", precision = 10, scale = 2)
-    private BigDecimal quantidadeProduto;
+    @OneToMany(mappedBy = "manejo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemManejo> itens = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "talhao_id", nullable = false)
     private Talhao talhao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "produto_safra_id")
-    private ProdutoSafra produtoSafra;
 }
