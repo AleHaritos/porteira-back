@@ -18,6 +18,8 @@ public interface FazendaColaboradorRepository extends JpaRepository<FazendaColab
 
     boolean existsByFazendaIdAndColaboradorId(Long fazendaId, Long usuarioId);
 
+    boolean existsByFazendaIdAndColaboradorNumero(Long fazendaId, String numero);
+
     void deleteByFazendaIdAndColaboradorId(Long fazendaId, Long usuarioId);
 
 }

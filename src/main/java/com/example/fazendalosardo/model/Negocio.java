@@ -1,9 +1,7 @@
 package com.example.fazendalosardo.model;
 
-import com.example.fazendalosardo.model.enums.TipoNegocio;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -22,11 +20,6 @@ public class Negocio {
     @NotBlank
     @Column(name = "nome", nullable = false)
     private String nome;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo", nullable = false, length = 30)
-    private TipoNegocio tipo;
 
     @Column(name = "descricao", length = 500)
     private String descricao;
