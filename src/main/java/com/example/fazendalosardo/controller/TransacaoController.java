@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.controller;
 
+import com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse;
 import com.example.fazendalosardo.dto.financeiro.TransacaoRequest;
 import com.example.fazendalosardo.dto.financeiro.TransacaoResponse;
 import com.example.fazendalosardo.dto.financeiro.TransacaoUpdateRequest;
@@ -52,6 +53,15 @@ public class TransacaoController {
     public ResponseEntity<Void> desativar(@PathVariable Long id, Authentication authentication) {
         transacaoService.desativar(id, authentication.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/fazenda/{fazendaId}/resumo")
+    public ResponseEntity<ResumoFinanceiroResponse> buscarResumo(
+            @PathVariable Long fazendaId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            Authentication authentication) {
+        return ResponseEntity.ok(transacaoService.buscarResumo(fazendaId, dataInicio, dataFim, authentication.getName()));
     }
 
     @PatchMapping("/{id}/reativar")

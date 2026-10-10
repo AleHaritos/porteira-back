@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.service;
 
+import com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse;
 import com.example.fazendalosardo.dto.financeiro.TransacaoRequest;
 import com.example.fazendalosardo.dto.financeiro.TransacaoResponse;
 import com.example.fazendalosardo.dto.financeiro.TransacaoUpdateRequest;
@@ -18,4 +19,5 @@ public interface TransacaoService {
     TransacaoResponse atualizar(Long id, TransacaoUpdateRequest request, String numeroUsuarioLogado);
     void desativar(Long id, String numeroUsuarioLogado);
     void reativar(Long id, String numeroUsuarioLogado);
+    ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
 }

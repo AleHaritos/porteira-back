@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.service.impl;
 
+import com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse;
 import com.example.fazendalosardo.dto.financeiro.TransacaoRequest;
 import com.example.fazendalosardo.dto.financeiro.TransacaoResponse;
 import com.example.fazendalosardo.dto.financeiro.TransacaoUpdateRequest;
@@ -78,6 +79,14 @@ public class TransacaoServiceImpl implements TransacaoService {
 
         transacao = transacaoRepository.save(transacao);
         return transacaoMapper.toResponse(transacao);
+    }
+
+    @Override
+    public ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaRepository.findById(fazendaId)
+                .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
+        validarAcesso(fazenda, numeroUsuarioLogado);
+        return transacaoRepository.buscarResumo(fazendaId, dataInicio, dataFim);
     }
 
     @Override
