@@ -14,7 +14,7 @@ import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.FazendaColaboradorRepository;
 import com.example.fazendalosardo.repository.FazendaRepository;
 import com.example.fazendalosardo.repository.NegocioRepository;
-import com.example.fazendalosardo.repository.TransacaoRepository;
+import com.example.fazendalosardo.repository.financeiro.TransacaoRepository;
 import com.example.fazendalosardo.repository.safras.SafraRepository;
 import com.example.fazendalosardo.service.TransacaoService;
 import jakarta.persistence.EntityNotFoundException;

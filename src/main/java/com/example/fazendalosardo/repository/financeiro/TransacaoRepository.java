@@ -1,4 +1,4 @@
-package com.example.fazendalosardo.repository;
+package com.example.fazendalosardo.repository.financeiro;
 
 import com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse;
 import com.example.fazendalosardo.model.Transacao;
