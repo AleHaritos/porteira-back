@@ -42,6 +42,21 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
                                           @Param("dataInicio") LocalDate dataInicio,
                                           @Param("dataFim") LocalDate dataFim);
 
+    @Query("""
+        SELECT new com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse(
+            COALESCE(SUM(CASE WHEN t.tipo = 'RECEITA' THEN t.valor ELSE 0 END), 0),
+            COALESCE(SUM(CASE WHEN t.tipo = 'GASTO' THEN t.valor ELSE 0 END), 0)
+        )
+        FROM Transacao t
+        WHERE t.negocio.id = :negocioId
+          AND t.ativo = true
+          AND t.data >= COALESCE(:dataInicio, t.data)
+          AND t.data <= COALESCE(:dataFim, t.data)
+        """)
+    ResumoFinanceiroResponse buscarResumoPorNegocio(@Param("negocioId") Long negocioId,
+                                                    @Param("dataInicio") LocalDate dataInicio,
+                                                    @Param("dataFim") LocalDate dataFim);
+
     Page<Transacao> findByNegocioIdAndAtivoTrue(Long negocioId, Pageable pageable);
 
     Page<Transacao> findBySafraIdAndAtivoTrue(Long safraId, Pageable pageable);

@@ -17,6 +17,7 @@ import com.example.fazendalosardo.repository.NegocioRepository;
 import com.example.fazendalosardo.repository.TransacaoRepository;
 import com.example.fazendalosardo.repository.safras.SafraRepository;
 import com.example.fazendalosardo.service.TransacaoService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -87,6 +88,16 @@ public class TransacaoServiceImpl implements TransacaoService {
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
         validarAcesso(fazenda, numeroUsuarioLogado);
         return transacaoRepository.buscarResumo(fazendaId, dataInicio, dataFim);
+    }
+
+    @Override
+    public ResumoFinanceiroResponse buscarResumoPorNegocio(Long negocioId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
+        Negocio negocio = negocioRepository.findById(negocioId)
+                .orElseThrow(() -> new EntityNotFoundException("Negócio não encontrado"));
+
+        validarAcesso(negocio.getFazenda(), numeroUsuarioLogado);
+
+        return transacaoRepository.buscarResumoPorNegocio(negocioId, dataInicio, dataFim);
     }
 
     @Override

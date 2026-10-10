@@ -64,6 +64,16 @@ public class TransacaoController {
         return ResponseEntity.ok(transacaoService.buscarResumo(fazendaId, dataInicio, dataFim, authentication.getName()));
     }
 
+    @GetMapping("/negocio/{negocioId}/resumo")
+    public ResponseEntity<ResumoFinanceiroResponse> buscarResumoPorNegocio(
+            @PathVariable Long negocioId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            Authentication authentication) {
+        String numeroUsuarioLogado = authentication.getName();
+        return ResponseEntity.ok(transacaoService.buscarResumoPorNegocio(negocioId, dataInicio, dataFim, numeroUsuarioLogado));
+    }
+
     @PatchMapping("/{id}/reativar")
     public ResponseEntity<Void> reativar(@PathVariable Long id, Authentication authentication) {
         transacaoService.reativar(id, authentication.getName());
