@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.model;
 
+import com.example.fazendalosardo.model.enums.FormaPagamentoManutencao;
 import com.example.fazendalosardo.model.enums.TipoManutencao;
 import com.example.fazendalosardo.model.safras.Safra;
 import jakarta.persistence.*;
@@ -64,6 +65,15 @@ public class Manutencao {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transacao_id")
     private Transacao transacao;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fornecedor_id")
+    private Fornecedor fornecedor;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "forma_pagamento", nullable = false)
+    private FormaPagamentoManutencao formaPagamento;
 
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;

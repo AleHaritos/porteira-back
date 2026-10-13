@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.dto.veiculos;
 
+import com.example.fazendalosardo.model.enums.FormaPagamentoManutencao;
 import com.example.fazendalosardo.model.enums.TipoManutencao;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -18,6 +19,8 @@ public record ManutencaoRequest(
         String observacao,
         @NotNull Long fazendaId,
         Long negocioId,
-        Long safraId
+        Long safraId,
+        @NotNull FormaPagamentoManutencao formaPagamento,
+        Long fornecedorId
 ) {
 }
