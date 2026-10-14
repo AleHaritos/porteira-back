@@ -49,6 +49,16 @@ public class TransacaoController {
         return ResponseEntity.ok(transacaoService.atualizar(id, request, authentication.getName()));
     }
 
+    @GetMapping("/safra/{safraId}/resumo")
+    public ResponseEntity<ResumoFinanceiroResponse> buscarResumoPorSafra(
+            @PathVariable Long safraId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            Authentication authentication) {
+        String numeroUsuarioLogado = authentication.getName();
+        return ResponseEntity.ok(transacaoService.buscarResumoPorSafra(safraId, dataInicio, dataFim, numeroUsuarioLogado));
+    }
+
     @PatchMapping("/{id}/desativar")
     public ResponseEntity<Void> desativar(@PathVariable Long id, Authentication authentication) {
         transacaoService.desativar(id, authentication.getName());

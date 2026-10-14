@@ -12,6 +12,8 @@ import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.equipamento.FornecedorRepository;
 import com.example.fazendalosardo.service.FornecedorService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,7 +41,14 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
-    public List<FornecedorResponse> listarPorFazenda(Long fazendaId, String numeroUsuarioLogado) {
+    public Page<FornecedorResponse> listarPorFazenda(Long fazendaId, Pageable pageable, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return fornecedorRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId, pageable)
+                .map(FornecedorResponse::de);
+    }
+
+    @Override
+    public List<FornecedorResponse> listarTodosPorFazenda(Long fazendaId, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
         return fornecedorRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId)
                 .stream().map(FornecedorResponse::de).toList();

@@ -19,6 +19,7 @@ public interface TransacaoService {
     TransacaoResponse atualizar(Long id, TransacaoUpdateRequest request, String numeroUsuarioLogado);
     void desativar(Long id, String numeroUsuarioLogado);
     void reativar(Long id, String numeroUsuarioLogado);
+    ResumoFinanceiroResponse buscarResumoPorSafra(Long safraId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
     ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
     ResumoFinanceiroResponse buscarResumoPorNegocio(Long negocioId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
 }

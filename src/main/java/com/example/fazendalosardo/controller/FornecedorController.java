@@ -6,6 +6,8 @@ import com.example.fazendalosardo.dto.equipamento.FornecedorResponse;
 import com.example.fazendalosardo.service.FornecedorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +27,19 @@ public class FornecedorController {
     }
 
     @GetMapping("/fazenda/{fazendaId}")
-    public ResponseEntity<List<FornecedorResponse>> listarPorFazenda(@PathVariable Long fazendaId, Authentication authentication) {
-        return ResponseEntity.ok(fornecedorService.listarPorFazenda(fazendaId, authentication.getName()));
+    public ResponseEntity<Page<FornecedorResponse>> listarPorFazenda(
+            @PathVariable Long fazendaId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                fornecedorService.listarPorFazenda(fazendaId, PageRequest.of(page, size), authentication.getName()));
+    }
+
+    @GetMapping("/fazenda/{fazendaId}/todos")
+    public ResponseEntity<List<FornecedorResponse>> listarTodosPorFazenda(
+            @PathVariable Long fazendaId, Authentication authentication) {
+        return ResponseEntity.ok(fornecedorService.listarTodosPorFazenda(fazendaId, authentication.getName()));
     }
 
     @PostMapping("/{id}/pagamento")

@@ -83,6 +83,16 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
 
     @Override
+    public ResumoFinanceiroResponse buscarResumoPorSafra(Long safraId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
+        Safra safra = safraRepository.findById(safraId)
+                .orElseThrow(() -> new EntityNotFoundException("Safra não encontrada"));
+
+        validarAcesso(safra.getFazenda(), numeroUsuarioLogado);
+
+        return transacaoRepository.buscarResumoPorSafra(safraId, dataInicio, dataFim);
+    }
+
+    @Override
     public ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaRepository.findById(fazendaId)
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
