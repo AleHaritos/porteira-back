@@ -4,9 +4,7 @@ import com.example.fazendalosardo.dto.veiculos.EstoqueCombustivelResponse;
 import com.example.fazendalosardo.dto.veiculos.ReabastecimentoEstoqueRequest;
 import com.example.fazendalosardo.model.EstoqueCombustivel;
 import com.example.fazendalosardo.model.Fazenda;
-import com.example.fazendalosardo.model.Negocio;
 import com.example.fazendalosardo.model.enums.TipoCombustivel;
-import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.veiculos.EstoqueCombustivelRepository;
 import com.example.fazendalosardo.service.EstoqueCombustivelService;
 import lombok.RequiredArgsConstructor;
@@ -21,19 +19,10 @@ public class EstoqueCombustivelServiceImpl implements EstoqueCombustivelService 
 
     private final EstoqueCombustivelRepository estoqueCombustivelRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
-    private final VeiculoTransacaoHelper helper;
 
     @Override
     public EstoqueCombustivelResponse reabastecer(ReabastecimentoEstoqueRequest request, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaAcessoHelper.buscarComAcesso(request.fazendaId(), numeroUsuarioLogado);
-        helper.validarVinculoXor(request.negocioId(), request.safraId());
-
-        Negocio negocio = helper.buscarNegocio(request.negocioId());
-        Safra safra = helper.buscarSafra(request.safraId());
-
-        BigDecimal valorTotal = request.litros().multiply(request.valorPorLitro());
-        String descricao = "Reabastecimento de estoque - %s".formatted(formatarCombustivel(request.tipoCombustivel()));
-        helper.gerarTransacaoGasto(fazenda, negocio, safra, valorTotal, request.data(), descricao);
 
         EstoqueCombustivel estoque = estoqueCombustivelRepository
                 .findByFazendaIdAndTipoCombustivel(fazenda.getId(), request.tipoCombustivel())
@@ -47,6 +36,7 @@ public class EstoqueCombustivelServiceImpl implements EstoqueCombustivelService 
 
         estoque.setQuantidadeLitros(estoque.getQuantidadeLitros().add(request.litros()));
         estoque.setUltimoValorPorLitro(request.valorPorLitro());
+        // sem Transacao aqui: o gasto só é contabilizado quando o combustível é consumido
 
         return EstoqueCombustivelResponse.de(estoqueCombustivelRepository.save(estoque));
     }
@@ -57,13 +47,5 @@ public class EstoqueCombustivelServiceImpl implements EstoqueCombustivelService 
         return estoqueCombustivelRepository.findByFazendaId(fazendaId).stream()
                 .map(EstoqueCombustivelResponse::de)
                 .toList();
-    }
-
-    private String formatarCombustivel(TipoCombustivel tipo) {
-        return switch (tipo) {
-            case DIESEL -> "Diesel";
-            case GASOLINA -> "Gasolina";
-            case ETANOL -> "Etanol";
-        };
     }
 }

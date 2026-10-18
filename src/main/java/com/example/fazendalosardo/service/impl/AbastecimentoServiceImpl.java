@@ -56,7 +56,7 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
 
         switch (request.localAbastecimento()) {
             case POSTO_CASUAL -> processarPostoCasual(abastecimento, request, veiculo, fazenda, negocio, safra);
-            case ESTOQUE_FAZENDA -> processarEstoqueFazenda(abastecimento, request, fazenda);
+            case ESTOQUE_FAZENDA -> processarEstoqueFazenda(abastecimento, request, veiculo, fazenda, negocio, safra);
             case POSTO_CREDENCIADO -> processarPostoCredenciado(abastecimento, request);
         }
 
@@ -77,7 +77,8 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setTransacao(transacao);
     }
 
-    private void processarEstoqueFazenda(Abastecimento abastecimento, AbastecimentoRequest request, Fazenda fazenda) {
+    private void processarEstoqueFazenda(Abastecimento abastecimento, AbastecimentoRequest request, Veiculo veiculo,
+                                         Fazenda fazenda, Negocio negocio, Safra safra) {
         EstoqueCombustivel estoque = estoqueCombustivelRepository
                 .findByFazendaIdAndTipoCombustivel(fazenda.getId(), request.tipoCombustivel())
                 .orElseThrow(() -> new BusinessException("Não há estoque cadastrado para esse combustível"));
@@ -86,13 +87,21 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
             throw new BusinessException("Estoque insuficiente: disponível %s L".formatted(estoque.getQuantidadeLitros()));
         }
 
+        BigDecimal valorPorLitroRef = estoque.getUltimoValorPorLitro();
+        if (valorPorLitroRef == null || valorPorLitroRef.signum() <= 0) {
+            throw new BusinessException("Estoque sem valor por litro definido");
+        }
+
         estoque.setQuantidadeLitros(estoque.getQuantidadeLitros().subtract(request.litros()));
         estoqueCombustivelRepository.save(estoque);
 
-        BigDecimal valorPorLitroRef = estoque.getUltimoValorPorLitro();
+        BigDecimal valorTotal = request.litros().multiply(valorPorLitroRef);
+        String descricao = "Abastecimento (estoque) - %s (%s)".formatted(veiculo.getNome(), formatarCombustivel(request.tipoCombustivel()));
+        Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, valorTotal, request.data(), descricao);
+
         abastecimento.setValorPorLitro(valorPorLitroRef);
-        abastecimento.setValorTotal(valorPorLitroRef != null ? request.litros().multiply(valorPorLitroRef) : null);
-        // sem Transacao: o custo já foi contabilizado no reabastecimento do estoque
+        abastecimento.setValorTotal(valorTotal);
+        abastecimento.setTransacao(transacao);
     }
 
     private void processarPostoCredenciado(Abastecimento abastecimento, AbastecimentoRequest request) {

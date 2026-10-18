@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/transacao")
@@ -36,10 +37,25 @@ public class TransacaoController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
             @RequestParam(required = false) TipoTransacao tipo,
+            @RequestParam(required = false) Long negocioId,
+            @RequestParam(required = false) Long safraId,
             Pageable pageable,
             Authentication authentication) {
         return ResponseEntity.ok(
-                transacaoService.buscarPorFazenda(fazendaId, dataInicio, dataFim, tipo, pageable, authentication.getName()));
+                transacaoService.buscarPorFazenda(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, pageable, authentication.getName()));
+    }
+
+    @GetMapping("/fazenda/{fazendaId}/todos")
+    public ResponseEntity<List<TransacaoResponse>> listarComFiltros(
+            @PathVariable Long fazendaId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @RequestParam(required = false) TipoTransacao tipo,
+            @RequestParam(required = false) Long negocioId,
+            @RequestParam(required = false) Long safraId,
+            Authentication authentication) {
+        return ResponseEntity.ok(
+                transacaoService.listarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, authentication.getName()));
     }
 
     @PutMapping("/{id}")
@@ -70,8 +86,10 @@ public class TransacaoController {
             @PathVariable Long fazendaId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @RequestParam(required = false) Long negocioId,
+            @RequestParam(required = false) Long safraId,
             Authentication authentication) {
-        return ResponseEntity.ok(transacaoService.buscarResumo(fazendaId, dataInicio, dataFim, authentication.getName()));
+        return ResponseEntity.ok(transacaoService.buscarResumo(fazendaId, dataInicio, dataFim, negocioId, safraId, authentication.getName()));
     }
 
     @GetMapping("/negocio/{negocioId}/resumo")

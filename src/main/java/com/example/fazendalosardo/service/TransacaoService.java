@@ -9,17 +9,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface TransacaoService {
     TransacaoResponse salvar(TransacaoRequest request, String numeroUsuarioLogado);
 
     Page<TransacaoResponse> buscarPorFazenda(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                             TipoTransacao tipo, Pageable pageable, String numeroUsuarioLogado);
+                                             TipoTransacao tipo, Long negocioId, Long safraId,
+                                             Pageable pageable, String numeroUsuarioLogado);
 
     TransacaoResponse atualizar(Long id, TransacaoUpdateRequest request, String numeroUsuarioLogado);
+
     void desativar(Long id, String numeroUsuarioLogado);
+
     void reativar(Long id, String numeroUsuarioLogado);
+
     ResumoFinanceiroResponse buscarResumoPorSafra(Long safraId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
-    ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
+
+    ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
+                                          Long negocioId, Long safraId, String numeroUsuarioLogado);
+
+    List<TransacaoResponse> listarComFiltros(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
+                                             TipoTransacao tipo, Long negocioId, Long safraId, String numeroUsuarioLogado);
+
     ResumoFinanceiroResponse buscarResumoPorNegocio(Long negocioId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
 }

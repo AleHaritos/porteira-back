@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,12 +58,13 @@ public class TransacaoServiceImpl implements TransacaoService {
 
     @Override
     public Page<TransacaoResponse> buscarPorFazenda(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                                    TipoTransacao tipo, Pageable pageable, String numeroUsuarioLogado) {
+                                                    TipoTransacao tipo, Long negocioId, Long safraId,
+                                                    Pageable pageable, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaRepository.findById(fazendaId)
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
         validarAcesso(fazenda, numeroUsuarioLogado);
 
-        return transacaoRepository.buscarComFiltros(fazendaId, dataInicio, dataFim, tipo, pageable)
+        return transacaoRepository.buscarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, pageable)
                 .map(transacaoMapper::toResponse);
     }
 
@@ -83,6 +85,17 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
 
     @Override
+    public List<TransacaoResponse> listarComFiltros(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
+                                                    TipoTransacao tipo, Long negocioId, Long safraId, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaRepository.findById(fazendaId)
+                .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
+        validarAcesso(fazenda, numeroUsuarioLogado);
+
+        return transacaoRepository.listarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId)
+                .stream().map(transacaoMapper::toResponse).toList();
+    }
+
+    @Override
     public ResumoFinanceiroResponse buscarResumoPorSafra(Long safraId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
         Safra safra = safraRepository.findById(safraId)
                 .orElseThrow(() -> new EntityNotFoundException("Safra não encontrada"));
@@ -93,11 +106,12 @@ public class TransacaoServiceImpl implements TransacaoService {
     }
 
     @Override
-    public ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
+    public ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
+                                                 Long negocioId, Long safraId, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaRepository.findById(fazendaId)
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
         validarAcesso(fazenda, numeroUsuarioLogado);
-        return transacaoRepository.buscarResumo(fazendaId, dataInicio, dataFim);
+        return transacaoRepository.buscarResumo(fazendaId, dataInicio, dataFim, negocioId, safraId);
     }
 
     @Override
