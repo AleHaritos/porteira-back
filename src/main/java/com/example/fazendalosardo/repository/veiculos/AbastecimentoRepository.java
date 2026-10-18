@@ -15,6 +15,9 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
     @Query("SELECT a FROM Abastecimento a WHERE a.veiculo.id = :veiculoId AND a.ativo = true ORDER BY a.data DESC")
     Page<Abastecimento> buscarPorVeiculo(@Param("veiculoId") Long veiculoId, Pageable pageable);
 
+    @Query("SELECT a FROM Abastecimento a WHERE a.posto.id = :postoId AND a.ativo = true ORDER BY a.data DESC")
+    Page<Abastecimento> buscarPorPosto(@Param("postoId") Long postoId, Pageable pageable);
+
     @Query("""
             SELECT a FROM Abastecimento a
             WHERE a.fazenda.id = :fazendaId

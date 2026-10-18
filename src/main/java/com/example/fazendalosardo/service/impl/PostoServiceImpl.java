@@ -12,6 +12,8 @@ import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.veiculos.PostoRepository;
 import com.example.fazendalosardo.service.PostoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,7 +42,13 @@ public class PostoServiceImpl implements PostoService {
     }
 
     @Override
-    public List<PostoResponse> listarPorFazenda(Long fazendaId, String numeroUsuarioLogado) {
+    public Page<PostoResponse> listarPorFazenda(Long fazendaId, Pageable pageable, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return postoRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId, pageable).map(PostoResponse::de);
+    }
+
+    @Override
+    public List<PostoResponse> listarTodosPorFazenda(Long fazendaId, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
         return postoRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId).stream()
                 .map(PostoResponse::de)

@@ -1,6 +1,7 @@
 package com.example.fazendalosardo.model;
 
 import com.example.fazendalosardo.model.enums.LocalAbastecimento;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.model.enums.TipoCombustivel;
 import com.example.fazendalosardo.model.safras.Safra;
 import jakarta.persistence.*;
@@ -69,6 +70,13 @@ public class Abastecimento {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "safra_id")
     private Safra safra;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_pagamento", nullable = false, length = 20)
+    private StatusParcela statusPagamento = StatusParcela.BAIXADO;
+
+    @Column(name = "data_baixa")
+    private LocalDate dataBaixa;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "transacao_id")

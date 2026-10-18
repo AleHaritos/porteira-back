@@ -13,9 +13,13 @@ public interface AbastecimentoService {
 
     Page<AbastecimentoResponse> buscarPorVeiculo(Long veiculoId, Pageable pageable, String numeroUsuarioLogado);
 
+    Page<AbastecimentoResponse> buscarPorPosto(Long postoId, Pageable pageable, String numeroUsuarioLogado);
+
     Page<AbastecimentoResponse> buscarPorFazenda(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
                                                  Long negocioId, Long safraId, Pageable pageable, String numeroUsuarioLogado);
 
     AbastecimentoResumoResponse buscarResumo(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
                                              Long negocioId, Long safraId, String numeroUsuarioLogado);
+
+    AbastecimentoResponse darBaixa(Long abastecimentoId, LocalDate dataBaixa, String numeroUsuarioLogado);
 }

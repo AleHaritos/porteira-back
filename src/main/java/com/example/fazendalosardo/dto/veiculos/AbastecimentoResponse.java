@@ -17,9 +17,12 @@ public record AbastecimentoResponse(
         BigDecimal valorTotal,
         TipoCombustivel tipoCombustivel,
         LocalAbastecimento localAbastecimento,
+        Long postoId,
         String postoNome,
         String observacao,
-        String vinculoNome
+        String vinculoNome,
+        String statusPagamento,
+        LocalDate dataBaixa
 ) {
     public static AbastecimentoResponse de(Abastecimento a) {
         String vinculo = a.getNegocio() != null ? a.getNegocio().getNome()
@@ -27,7 +30,10 @@ public record AbastecimentoResponse(
         return new AbastecimentoResponse(a.getId(), a.getVeiculo().getId(), a.getVeiculo().getNome(),
                 a.getData(), a.getLitros(), a.getValorPorLitro(), a.getValorTotal(),
                 a.getTipoCombustivel(), a.getLocalAbastecimento(),
+                a.getPosto() != null ? a.getPosto().getId() : null,
                 a.getPosto() != null ? a.getPosto().getNome() : null,
-                a.getObservacao(), vinculo);
+                a.getObservacao(), vinculo,
+                a.getStatusPagamento() != null ? a.getStatusPagamento().name() : null,
+                a.getDataBaixa());
     }
 }

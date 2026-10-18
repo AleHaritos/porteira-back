@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +55,18 @@ public class AbastecimentoController {
                                                                     @RequestParam(required = false) Long safraId,
                                                                     Authentication authentication) {
         return ResponseEntity.ok(abastecimentoService.buscarResumo(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, authentication.getName()));
+    }
+
+    @GetMapping("/posto/{postoId}")
+    public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPosto(@PathVariable Long postoId, Pageable pageable,
+                                                                      Authentication authentication) {
+        return ResponseEntity.ok(abastecimentoService.buscarPorPosto(postoId, pageable, authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/baixa")
+    public ResponseEntity<AbastecimentoResponse> darBaixa(@PathVariable Long id,
+                                                          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataBaixa,
+                                                          Authentication authentication) {
+        return ResponseEntity.ok(abastecimentoService.darBaixa(id, dataBaixa, authentication.getName()));
     }
 }

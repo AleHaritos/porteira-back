@@ -6,6 +6,8 @@ import com.example.fazendalosardo.dto.veiculos.AbastecimentoResumoResponse;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.*;
+import com.example.fazendalosardo.model.enums.LocalAbastecimento;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.model.enums.TipoCombustivel;
 import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.veiculos.AbastecimentoRepository;
@@ -76,6 +78,7 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setValorPorLitro(request.valorPorLitro());
         abastecimento.setValorTotal(valorTotal);
         abastecimento.setTransacao(transacao);
+        abastecimento.setStatusPagamento(StatusParcela.BAIXADO);
     }
 
     @Override
@@ -118,6 +121,7 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setValorPorLitro(valorPorLitroRef);
         abastecimento.setValorTotal(valorTotal);
         abastecimento.setTransacao(transacao);
+        abastecimento.setStatusPagamento(StatusParcela.BAIXADO);
     }
 
     private void processarPostoCredenciado(Abastecimento abastecimento, AbastecimentoRequest request) {
@@ -138,7 +142,7 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setPosto(posto);
         abastecimento.setValorPorLitro(request.valorPorLitro());
         abastecimento.setValorTotal(valorTotal);
-        // sem Transacao: entra como dívida corrente do posto, paga depois
+        abastecimento.setStatusPagamento(StatusParcela.PENDENTE);
     }
 
     @Override
@@ -148,6 +152,48 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         fazendaAcessoHelper.validarAcesso(veiculo.getFazenda(), numeroUsuarioLogado);
         return abastecimentoRepository.buscarPorVeiculo(veiculoId, pageable).map(AbastecimentoResponse::de);
     }
+
+    @Override
+    public Page<AbastecimentoResponse> buscarPorPosto(Long postoId, Pageable pageable, String numeroUsuarioLogado) {
+        Posto posto = postoRepository.findById(postoId)
+                .orElseThrow(() -> new NotFoundException("Posto não encontrado"));
+        fazendaAcessoHelper.validarAcesso(posto.getFazenda(), numeroUsuarioLogado);
+        return abastecimentoRepository.buscarPorPosto(postoId, pageable).map(AbastecimentoResponse::de);
+    }
+
+    @Override
+    public AbastecimentoResponse darBaixa(Long abastecimentoId, LocalDate dataBaixa, String numeroUsuarioLogado) {
+        Abastecimento abastecimento = abastecimentoRepository.findById(abastecimentoId)
+                .orElseThrow(() -> new NotFoundException("Abastecimento não encontrado"));
+
+        Fazenda fazenda = abastecimento.getFazenda();
+        fazendaAcessoHelper.validarAcesso(fazenda, numeroUsuarioLogado);
+
+        if (abastecimento.getLocalAbastecimento() != LocalAbastecimento.POSTO_CREDENCIADO) {
+            throw new BusinessException("Esse abastecimento não gera dívida com posto");
+        }
+        if (abastecimento.getStatusPagamento() == StatusParcela.BAIXADO) {
+            throw new BusinessException("Esse abastecimento já foi pago");
+        }
+
+        Posto posto = abastecimento.getPosto();
+        LocalDate dataEfetiva = dataBaixa != null ? dataBaixa : LocalDate.now();
+
+        String descricao = "Pagamento posto - %s (abastecimento de %s)"
+                .formatted(posto.getNome(), abastecimento.getVeiculo().getNome());
+        Transacao transacao = helper.gerarTransacaoGasto(fazenda, abastecimento.getNegocio(), abastecimento.getSafra(),
+                abastecimento.getValorTotal(), dataEfetiva, descricao);
+
+        abastecimento.setTransacao(transacao);
+        abastecimento.setStatusPagamento(StatusParcela.BAIXADO);
+        abastecimento.setDataBaixa(dataEfetiva);
+
+        posto.setSaldoDevedor(posto.getSaldoDevedor().subtract(abastecimento.getValorTotal()));
+        postoRepository.save(posto);
+
+        return AbastecimentoResponse.de(abastecimentoRepository.save(abastecimento));
+    }
+
 
     private String formatarCombustivel(TipoCombustivel tipo) {
         return switch (tipo) {
