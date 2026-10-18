@@ -77,9 +77,6 @@ public class VeiculoServiceImpl implements VeiculoService {
         veiculo.setNome(request.nome());
         veiculo.setPlaca(request.placa());
         veiculo.setDataCompra(request.dataCompra());
-        veiculo.setValorCompra(request.valorCompra());
-        veiculo.setAno(request.ano());
-        veiculo.setKmInicial(request.kmInicial());
         veiculo.setObservacao(request.observacao());
         veiculo.setTipo(request.tipo());
         veiculo.setFazenda(fazenda);

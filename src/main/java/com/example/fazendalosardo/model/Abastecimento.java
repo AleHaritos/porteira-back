@@ -55,10 +55,6 @@ public class Abastecimento {
     @Column(name = "local_abastecimento", nullable = false, length = 20)
     private LocalAbastecimento localAbastecimento;
 
-    @PositiveOrZero
-    @Column(name = "km_atual")
-    private Integer kmAtual;
-
     @Column(name = "observacao", length = 500)
     private String observacao;
 

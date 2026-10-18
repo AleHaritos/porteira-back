@@ -18,7 +18,6 @@ public record AbastecimentoResponse(
         TipoCombustivel tipoCombustivel,
         LocalAbastecimento localAbastecimento,
         String postoNome,
-        Integer kmAtual,
         String observacao,
         String vinculoNome
 ) {
@@ -29,6 +28,6 @@ public record AbastecimentoResponse(
                 a.getData(), a.getLitros(), a.getValorPorLitro(), a.getValorTotal(),
                 a.getTipoCombustivel(), a.getLocalAbastecimento(),
                 a.getPosto() != null ? a.getPosto().getNome() : null,
-                a.getKmAtual(), a.getObservacao(), vinculo);
+                a.getObservacao(), vinculo);
     }
 }

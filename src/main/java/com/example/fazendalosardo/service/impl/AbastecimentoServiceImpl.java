@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.veiculos.AbastecimentoRequest;
 import com.example.fazendalosardo.dto.veiculos.AbastecimentoResponse;
+import com.example.fazendalosardo.dto.veiculos.AbastecimentoResumoResponse;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.*;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +49,6 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setLitros(request.litros());
         abastecimento.setTipoCombustivel(request.tipoCombustivel());
         abastecimento.setLocalAbastecimento(request.localAbastecimento());
-        abastecimento.setKmAtual(request.kmAtual());
         abastecimento.setObservacao(request.observacao());
         abastecimento.setFazenda(fazenda);
         abastecimento.setNegocio(negocio);
@@ -75,6 +76,21 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setValorPorLitro(request.valorPorLitro());
         abastecimento.setValorTotal(valorTotal);
         abastecimento.setTransacao(transacao);
+    }
+
+    @Override
+    public Page<AbastecimentoResponse> buscarPorFazenda(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
+                                                        Long negocioId, Long safraId, Pageable pageable, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return abastecimentoRepository.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, pageable)
+                .map(AbastecimentoResponse::de);
+    }
+
+    @Override
+    public AbastecimentoResumoResponse buscarResumo(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
+                                                    Long negocioId, Long safraId, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return abastecimentoRepository.buscarResumo(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId);
     }
 
     private void processarEstoqueFazenda(Abastecimento abastecimento, AbastecimentoRequest request, Veiculo veiculo,

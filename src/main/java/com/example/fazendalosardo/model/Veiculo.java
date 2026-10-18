@@ -5,11 +5,8 @@ import com.example.fazendalosardo.model.enums.TipoVeiculo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -36,20 +33,6 @@ public class Veiculo {
     @Column(name = "data_compra", nullable = false)
     private LocalDate dataCompra;
 
-    @NotNull
-    @Positive
-    @Column(name = "valor_compra", precision = 12, scale = 2, nullable = false)
-    private BigDecimal valorCompra;
-
-    @NotNull
-    @Column(name = "ano", nullable = false)
-    private Integer ano;
-
-    @NotNull
-    @PositiveOrZero
-    @Column(name = "km_inicial", nullable = false)
-    private Integer kmInicial;
-
     @Column(name = "observacao", length = 500)
     private String observacao;
 
@@ -63,6 +46,6 @@ public class Veiculo {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fazenda_id", nullable = false)
-    private Fazenda fazenda;;
+    private Fazenda fazenda;
 
 }
