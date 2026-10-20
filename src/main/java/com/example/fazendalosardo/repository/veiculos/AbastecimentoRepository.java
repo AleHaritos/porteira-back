@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Long> {
@@ -55,4 +56,7 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
                                              @Param("dataFim") LocalDate dataFim,
                                              @Param("negocioId") Long negocioId,
                                              @Param("safraId") Long safraId);
+
+    @Query("SELECT COALESCE(SUM(a.valorTotal), 0) FROM Abastecimento a WHERE a.safra.id = :safraId AND a.ativo = true")
+    BigDecimal somarValorPorSafra(@Param("safraId") Long safraId);
 }

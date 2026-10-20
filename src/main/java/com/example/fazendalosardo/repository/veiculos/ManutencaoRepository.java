@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ManutencaoRepository extends JpaRepository<Manutencao, Long> {
@@ -17,4 +18,7 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, Long> {
 
     @Query("SELECT m FROM Manutencao m WHERE m.fornecedor.id = :fornecedorId AND m.statusPagamento = :status ORDER BY m.data DESC")
     List<Manutencao> listarPendentesPorFornecedor(@Param("fornecedorId") Long fornecedorId, @Param("status") StatusParcela status);
+
+    @Query("SELECT COALESCE(SUM(m.valor), 0) FROM Manutencao m WHERE m.safra.id = :safraId AND m.ativo = true")
+    BigDecimal somarValorPorSafra(@Param("safraId") Long safraId);
 }
