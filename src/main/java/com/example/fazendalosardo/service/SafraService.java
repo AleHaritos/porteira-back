@@ -16,4 +16,6 @@ public interface SafraService {
 
     SafraResponse atualizar(Long id, SafraUpdateRequest request);
 
+    SafraResponse buscarPorId(Long id);
+
 }

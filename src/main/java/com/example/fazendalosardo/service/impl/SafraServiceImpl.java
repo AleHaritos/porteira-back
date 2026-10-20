@@ -51,6 +51,14 @@ public class SafraServiceImpl implements SafraService {
                 .map(safraMapper::toResponse);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public SafraResponse buscarPorId(Long id) {
+        Safra safra = safraRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Safra não encontrada"));
+        return safraMapper.toResponse(safra);
+    }
+
 
     @Override
     @Transactional

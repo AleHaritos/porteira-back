@@ -44,4 +44,9 @@ public class SafraController {
     ) {
         return ResponseEntity.ok(safraService.atualizar(id, request));
     }
+
+    @GetMapping("/detalhe/{id}")
+    public ResponseEntity<SafraResponse> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(safraService.buscarPorId(id));
+    }
 }

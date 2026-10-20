@@ -41,6 +41,23 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
+    public FornecedorResponse buscarPorId(Long id, String numeroUsuarioLogado) {
+        Fornecedor fornecedor = fornecedorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
+        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
+        return FornecedorResponse.de(fornecedor);
+    }
+
+    @Override
+    public Fornecedor baixarDivida(Long fornecedorId, BigDecimal valor, String numeroUsuarioLogado) {
+        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
+                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
+        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
+        fornecedor.setSaldoDevedor(fornecedor.getSaldoDevedor().subtract(valor));
+        return fornecedorRepository.save(fornecedor);
+    }
+
+    @Override
     public Page<FornecedorResponse> listarPorFazenda(Long fazendaId, Pageable pageable, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
         return fornecedorRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId, pageable)

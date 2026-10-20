@@ -18,7 +18,9 @@ public record ManutencaoEquipamentoResponse(
         String observacao,
         FormaPagamentoManutencao formaPagamento,
         String fornecedorNome,
-        String vinculoNome
+        String vinculoNome,
+        String statusPagamento,
+        LocalDate dataBaixa
 ) {
     public static ManutencaoEquipamentoResponse de(ManutencaoEquipamento m) {
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
@@ -26,6 +28,7 @@ public record ManutencaoEquipamentoResponse(
         String fornecedorNome = m.getFornecedor() != null ? m.getFornecedor().getNome() : null;
         return new ManutencaoEquipamentoResponse(m.getId(), m.getEquipamento().getId(), m.getEquipamento().getNome(),
                 m.getTipo(), m.getDescricao(), m.getData(), m.getValor(), m.getObservacao(),
-                m.getFormaPagamento(), fornecedorNome, vinculo);
+                m.getFormaPagamento(), fornecedorNome, vinculo,
+                m.getStatusPagamento().name(), m.getDataBaixa());
     }
 }

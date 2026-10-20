@@ -7,9 +7,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/manutencao")
@@ -28,5 +32,21 @@ public class ManutencaoController {
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorVeiculo(@PathVariable Long veiculoId, Pageable pageable,
                                                                      Authentication authentication) {
         return ResponseEntity.ok(manutencaoService.buscarPorVeiculo(veiculoId, pageable, authentication.getName()));
+    }
+
+    @GetMapping("/fornecedor/{fornecedorId}/pendentes")
+    public ResponseEntity<List<ManutencaoResponse>> listarPendentesPorFornecedor(@PathVariable Long fornecedorId,
+                                                                                 Authentication authentication) {
+        return ResponseEntity.ok(manutencaoService.listarPendentesPorFornecedor(fornecedorId, authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/baixa")
+    public ResponseEntity<ManutencaoResponse> darBaixa(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long negocioId,
+            @RequestParam(required = false) Long safraId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataBaixa,
+            Authentication authentication) {
+        return ResponseEntity.ok(manutencaoService.darBaixa(id, negocioId, safraId, dataBaixa, authentication.getName()));
     }
 }

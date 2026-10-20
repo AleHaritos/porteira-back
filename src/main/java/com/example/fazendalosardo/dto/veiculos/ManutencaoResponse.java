@@ -19,7 +19,9 @@ public record ManutencaoResponse(
         String observacao,
         FormaPagamentoManutencao formaPagamento,
         String fornecedorNome,
-        String vinculoNome
+        String vinculoNome,
+        String statusPagamento,
+        LocalDate dataBaixa
 ) {
     public static ManutencaoResponse de(Manutencao m) {
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
@@ -27,6 +29,7 @@ public record ManutencaoResponse(
         String fornecedorNome = m.getFornecedor() != null ? m.getFornecedor().getNome() : null;
         return new ManutencaoResponse(m.getId(), m.getVeiculo().getId(), m.getVeiculo().getNome(),
                 m.getTipo(), m.getDescricao(), m.getData(), m.getValor(), m.getKmAtual(), m.getObservacao(),
-                m.getFormaPagamento(), fornecedorNome, vinculo);
+                m.getFormaPagamento(), fornecedorNome, vinculo,
+                m.getStatusPagamento().name(), m.getDataBaixa());
     }
 }

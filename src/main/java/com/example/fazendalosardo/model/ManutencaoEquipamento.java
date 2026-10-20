@@ -1,6 +1,7 @@
 package com.example.fazendalosardo.model;
 
 import com.example.fazendalosardo.model.enums.FormaPagamentoManutencao;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.model.enums.TipoManutencao;
 import com.example.fazendalosardo.model.safras.Safra;
 import jakarta.persistence.*;
@@ -75,4 +76,12 @@ public class ManutencaoEquipamento {
     @Enumerated(EnumType.STRING)
     @Column(name = "forma_pagamento", nullable = false)
     private FormaPagamentoManutencao formaPagamento;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_pagamento", nullable = false, length = 20)
+    private StatusParcela statusPagamento = StatusParcela.BAIXADO;
+
+    @Column(name = "data_baixa")
+    private LocalDate dataBaixa;
 }

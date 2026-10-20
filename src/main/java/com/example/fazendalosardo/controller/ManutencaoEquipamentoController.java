@@ -7,9 +7,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/manutencao-equipamento")
@@ -29,4 +33,20 @@ public class ManutencaoEquipamentoController {
                                                                                     Authentication authentication) {
         return ResponseEntity.ok(manutencaoEquipamentoService.buscarPorEquipamento(equipamentoId, pageable, authentication.getName()));
     }
+    @GetMapping("/fornecedor/{fornecedorId}/pendentes")
+    public ResponseEntity<List<ManutencaoEquipamentoResponse>> listarPendentesPorFornecedor(@PathVariable Long fornecedorId,
+                                                                                            Authentication authentication) {
+        return ResponseEntity.ok(manutencaoEquipamentoService.listarPendentesPorFornecedor(fornecedorId, authentication.getName()));
+    }
+
+    @PatchMapping("/{id}/baixa")
+    public ResponseEntity<ManutencaoEquipamentoResponse> darBaixa(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long negocioId,
+            @RequestParam(required = false) Long safraId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataBaixa,
+            Authentication authentication) {
+        return ResponseEntity.ok(manutencaoEquipamentoService.darBaixa(id, negocioId, safraId, dataBaixa, authentication.getName()));
+    }
+
 }

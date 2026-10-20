@@ -42,6 +42,11 @@ public class FornecedorController {
         return ResponseEntity.ok(fornecedorService.listarTodosPorFazenda(fazendaId, authentication.getName()));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<FornecedorResponse> buscarPorId(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(fornecedorService.buscarPorId(id, authentication.getName()));
+    }
+
     @PostMapping("/{id}/pagamento")
     public ResponseEntity<FornecedorResponse> registrarPagamento(@PathVariable Long id, @Valid @RequestBody FornecedorPagamentoRequest request,
                                                                  Authentication authentication) {
