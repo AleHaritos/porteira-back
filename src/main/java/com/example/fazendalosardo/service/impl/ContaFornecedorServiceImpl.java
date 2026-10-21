@@ -34,12 +34,18 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
         Fornecedor fornecedor = fornecedorRepository.findById(request.fornecedorId())
                 .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
 
+        helper.validarVinculoXor(request.negocioId(), request.safraId());
+        Negocio negocio = helper.buscarNegocio(request.negocioId());
+        Safra safra = helper.buscarSafra(request.safraId());
+
         ContaFornecedor conta = new ContaFornecedor();
         conta.setFornecedor(fornecedor);
         conta.setFazenda(fazenda);
         conta.setDescricao(request.descricao());
         conta.setData(request.data());
         conta.setValor(request.valor());
+        conta.setNegocio(negocio);
+        conta.setSafra(safra);
         conta.setStatusPagamento(StatusParcela.PENDENTE);
 
         fornecedorService.acumularDivida(fornecedor.getId(), request.valor(), numeroUsuarioLogado);
@@ -57,7 +63,7 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
     }
 
     @Override
-    public ContaFornecedorResponse darBaixa(Long contaId, Long negocioId, Long safraId, LocalDate dataBaixa, String numeroUsuarioLogado) {
+    public ContaFornecedorResponse darBaixa(Long contaId, LocalDate dataBaixa, String numeroUsuarioLogado) {
         ContaFornecedor conta = contaFornecedorRepository.findById(contaId)
                 .orElseThrow(() -> new NotFoundException("Conta não encontrada"));
         fazendaAcessoHelper.validarAcesso(conta.getFazenda(), numeroUsuarioLogado);
@@ -66,18 +72,13 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
             throw new BusinessException("Esta conta já foi paga");
         }
 
-        helper.validarVinculoXor(negocioId, safraId);
-        Negocio negocio = helper.buscarNegocio(negocioId);
-        Safra safra = helper.buscarSafra(safraId);
-
         LocalDate dataEfetiva = dataBaixa != null ? dataBaixa : LocalDate.now();
         String descricao = "%s - %s".formatted(conta.getDescricao(), conta.getFornecedor().getNome());
 
-        Transacao transacao = helper.gerarTransacaoGasto(conta.getFazenda(), negocio, safra, conta.getValor(), dataEfetiva, descricao);
+        Transacao transacao = helper.gerarTransacaoGasto(
+                conta.getFazenda(), conta.getNegocio(), conta.getSafra(), conta.getValor(), dataEfetiva, descricao);
 
         conta.setTransacao(transacao);
-        conta.setNegocio(negocio);
-        conta.setSafra(safra);
         conta.setStatusPagamento(StatusParcela.BAIXADO);
         conta.setDataBaixa(dataEfetiva);
 

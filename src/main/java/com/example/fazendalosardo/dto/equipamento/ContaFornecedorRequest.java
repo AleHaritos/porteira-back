@@ -12,6 +12,8 @@ public record ContaFornecedorRequest(
         @NotNull Long fazendaId,
         @NotBlank String descricao,
         @NotNull LocalDate data,
-        @NotNull @Positive BigDecimal valor
+        @NotNull @Positive BigDecimal valor,
+        Long negocioId,
+        Long safraId
 ) {
 }

@@ -12,5 +12,5 @@ public interface ManutencaoService {
     ManutencaoResponse salvar(ManutencaoRequest request, String numeroUsuarioLogado);
     Page<ManutencaoResponse> buscarPorVeiculo(Long veiculoId, Pageable pageable, String numeroUsuarioLogado);
     List<ManutencaoResponse> listarPendentesPorFornecedor(Long fornecedorId, String numeroUsuarioLogado);
-    ManutencaoResponse darBaixa(Long manutencaoId, Long negocioId, Long safraId, LocalDate dataBaixa, String numeroUsuarioLogado);
+    ManutencaoResponse darBaixa(Long manutencaoId, LocalDate dataBaixa, String numeroUsuarioLogado);
 }

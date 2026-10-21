@@ -39,14 +39,9 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
         Equipamento equipamento = equipamentoRepository.findById(request.equipamentoId())
                 .orElseThrow(() -> new NotFoundException("Equipamento não encontrado"));
 
-        Negocio negocio = null;
-        Safra safra = null;
-
-        if (request.formaPagamento() == FormaPagamentoManutencao.A_VISTA) {
-            helper.validarVinculoXor(request.negocioId(), request.safraId());
-            negocio = helper.buscarNegocio(request.negocioId());
-            safra = helper.buscarSafra(request.safraId());
-        }
+        helper.validarVinculoXor(request.negocioId(), request.safraId());
+        Negocio negocio = helper.buscarNegocio(request.negocioId());
+        Safra safra = helper.buscarSafra(request.safraId());
 
         String base = (request.descricao() != null && !request.descricao().isBlank())
                 ? request.descricao() : "Manutenção";
@@ -99,7 +94,7 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
     }
 
     @Override
-    public ManutencaoEquipamentoResponse darBaixa(Long manutencaoId, Long negocioId, Long safraId, LocalDate dataBaixa, String numeroUsuarioLogado) {
+    public ManutencaoEquipamentoResponse darBaixa(Long manutencaoId, LocalDate dataBaixa, String numeroUsuarioLogado) {
         ManutencaoEquipamento manutencao = manutencaoEquipamentoRepository.findById(manutencaoId)
                 .orElseThrow(() -> new NotFoundException("Manutenção não encontrada"));
         fazendaAcessoHelper.validarAcesso(manutencao.getFazenda(), numeroUsuarioLogado);
@@ -111,20 +106,15 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
             throw new BusinessException("Esta manutenção já foi paga");
         }
 
-        helper.validarVinculoXor(negocioId, safraId);
-        Negocio negocio = helper.buscarNegocio(negocioId);
-        Safra safra = helper.buscarSafra(safraId);
-
         LocalDate dataEfetiva = dataBaixa != null ? dataBaixa : LocalDate.now();
         String descricaoBase = (manutencao.getDescricao() != null && !manutencao.getDescricao().isBlank())
                 ? manutencao.getDescricao() : "Manutenção";
         String descricao = "%s - %s".formatted(descricaoBase, manutencao.getEquipamento().getNome());
 
-        Transacao transacao = helper.gerarTransacaoGasto(manutencao.getFazenda(), negocio, safra, manutencao.getValor(), dataEfetiva, descricao);
+        Transacao transacao = helper.gerarTransacaoGasto(
+                manutencao.getFazenda(), manutencao.getNegocio(), manutencao.getSafra(), manutencao.getValor(), dataEfetiva, descricao);
 
         manutencao.setTransacao(transacao);
-        manutencao.setNegocio(negocio);
-        manutencao.setSafra(safra);
         manutencao.setStatusPagamento(StatusParcela.BAIXADO);
         manutencao.setDataBaixa(dataEfetiva);
 

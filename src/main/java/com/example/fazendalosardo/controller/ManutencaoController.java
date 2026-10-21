@@ -43,10 +43,8 @@ public class ManutencaoController {
     @PatchMapping("/{id}/baixa")
     public ResponseEntity<ManutencaoResponse> darBaixa(
             @PathVariable Long id,
-            @RequestParam(required = false) Long negocioId,
-            @RequestParam(required = false) Long safraId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataBaixa,
             Authentication authentication) {
-        return ResponseEntity.ok(manutencaoService.darBaixa(id, negocioId, safraId, dataBaixa, authentication.getName()));
+        return ResponseEntity.ok(manutencaoService.darBaixa(id, dataBaixa, authentication.getName()));
     }
 }

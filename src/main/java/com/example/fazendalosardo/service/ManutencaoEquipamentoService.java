@@ -12,5 +12,5 @@ public interface ManutencaoEquipamentoService {
     ManutencaoEquipamentoResponse salvar(ManutencaoEquipamentoRequest request, String numeroUsuarioLogado);
     Page<ManutencaoEquipamentoResponse> buscarPorEquipamento(Long equipamentoId, Pageable pageable, String numeroUsuarioLogado);
     List<ManutencaoEquipamentoResponse> listarPendentesPorFornecedor(Long fornecedorId, String numeroUsuarioLogado);
-    ManutencaoEquipamentoResponse darBaixa(Long manutencaoId, Long negocioId, Long safraId, LocalDate dataBaixa, String numeroUsuarioLogado);
+    ManutencaoEquipamentoResponse darBaixa(Long manutencaoId, LocalDate dataBaixa, String numeroUsuarioLogado);
 }

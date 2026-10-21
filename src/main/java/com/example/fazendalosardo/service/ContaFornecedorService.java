@@ -9,5 +9,5 @@ import java.util.List;
 public interface ContaFornecedorService {
     ContaFornecedorResponse salvar(ContaFornecedorRequest request, String numeroUsuarioLogado);
     List<ContaFornecedorResponse> listarPendentesPorFornecedor(Long fornecedorId, String numeroUsuarioLogado);
-    ContaFornecedorResponse darBaixa(Long contaId, Long negocioId, Long safraId, LocalDate dataBaixa, String numeroUsuarioLogado);
+    ContaFornecedorResponse darBaixa(Long contaId, LocalDate dataBaixa, String numeroUsuarioLogado);
 }
