@@ -23,9 +23,6 @@ public class Lote {
     @Column(nullable = false)
     private String nome;
 
-    @Column(nullable = false)
-    private Integer quantidade;
-
     @Column(length = 1000)
     private String observacoes;
 

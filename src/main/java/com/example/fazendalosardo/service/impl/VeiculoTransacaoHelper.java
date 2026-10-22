@@ -59,4 +59,18 @@ public class VeiculoTransacaoHelper {
         transacao.setAtivo(true);
         return transacaoRepository.save(transacao);
     }
+
+    public Transacao gerarTransacaoReceita(Fazenda fazenda, Negocio negocio, Safra safra,
+                                           BigDecimal valor, LocalDate data, String descricao) {
+        Transacao transacao = new Transacao();
+        transacao.setTipo(TipoTransacao.RECEITA);
+        transacao.setValor(valor);
+        transacao.setData(data);
+        transacao.setDescricao(descricao);
+        transacao.setFazenda(fazenda);
+        transacao.setNegocio(negocio);
+        transacao.setSafra(safra);
+        transacao.setAtivo(true);
+        return transacaoRepository.save(transacao);
+    }
 }

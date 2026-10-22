@@ -5,6 +5,7 @@ import com.example.fazendalosardo.dto.animais.LoteResponse;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.Fazenda;
 import com.example.fazendalosardo.model.Lote;
+import com.example.fazendalosardo.repository.animais.AnimalRepository;
 import com.example.fazendalosardo.repository.animais.LoteRepository;
 import com.example.fazendalosardo.service.LoteService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import java.util.List;
 public class LoteServiceImpl implements LoteService {
 
     private final LoteRepository loteRepository;
+    private final AnimalRepository animalRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
 
     @Override
@@ -27,7 +29,6 @@ public class LoteServiceImpl implements LoteService {
 
         Lote lote = new Lote();
         lote.setNome(request.nome());
-        lote.setQuantidade(request.quantidade());
         lote.setObservacoes(request.observacoes());
         lote.setFazenda(fazenda);
         lote.setAtivo(true);
@@ -44,7 +45,6 @@ public class LoteServiceImpl implements LoteService {
         fazendaAcessoHelper.validarAcesso(lote.getFazenda(), numeroUsuarioLogado);
 
         lote.setNome(request.nome());
-        lote.setQuantidade(request.quantidade());
         lote.setObservacoes(request.observacoes());
 
         return toResponse(lote);
@@ -67,12 +67,13 @@ public class LoteServiceImpl implements LoteService {
     }
 
     private LoteResponse toResponse(Lote lote) {
+        long quantidadeAnimais = animalRepository.countByLoteId(lote.getId());
         return new LoteResponse(
                 lote.getId(),
                 lote.getNome(),
-                lote.getQuantidade(),
                 lote.getObservacoes(),
-                lote.getAtivo()
+                lote.getAtivo(),
+                quantidadeAnimais
         );
     }
 }
