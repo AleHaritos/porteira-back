@@ -9,9 +9,15 @@ import com.example.fazendalosardo.model.enums.TipoCuidado;
 import com.example.fazendalosardo.repository.animais.*;
 import com.example.fazendalosardo.service.CuidadoAnimalService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -19,6 +25,7 @@ import java.util.List;
 public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
 
     private final CuidadoAnimalRepository cuidadoAnimalRepository;
+    private final CuidadoAnimalRateioRepository cuidadoAnimalRateioRepository;
     private final AnimalRepository animalRepository;
     private final LoteRepository loteRepository;
     private final PiqueteRepository piqueteRepository;
@@ -52,7 +59,7 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
                         .orElseThrow(() -> new NotFoundException("Lote não encontrado"));
             }
             case PIQUETE -> {
-                // aplica a todo o piquete, sem animal/lote específico
+
             }
         }
 
@@ -77,18 +84,46 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
 
         cuidadoAnimalRepository.save(cuidado);
 
+        gerarRateio(cuidado, animal, lote, piquete);
+
         return toResponse(cuidado);
     }
 
+    private void gerarRateio(CuidadoAnimal cuidado, Animal animal, Lote lote, Piquete piquete) {
+        List<Animal> animaisElegiveis = switch (cuidado.getVinculoTipo()) {
+            case ANIMAL -> List.of(animal);
+            case LOTE -> animalRepository.findByLoteIdAndPiqueteIdAndAtivoTrue(lote.getId(), piquete.getId());
+            case PIQUETE -> animalRepository.findByPiqueteIdAndAtivoTrue(piquete.getId());
+        };
+
+        if (animaisElegiveis.isEmpty()) {
+            throw new BusinessException("Não há animais ativos para ratear esse custo");
+        }
+
+        BigDecimal custoPorAnimal = cuidado.getCusto()
+                .divide(BigDecimal.valueOf(animaisElegiveis.size()), 2, RoundingMode.HALF_UP);
+
+        List<CuidadoAnimalRateio> rateios = animaisElegiveis.stream().map(a -> {
+            CuidadoAnimalRateio r = new CuidadoAnimalRateio();
+            r.setCuidadoAnimal(cuidado);
+            r.setAnimal(a);
+            r.setCustoAtribuido(custoPorAnimal);
+            return r;
+        }).toList();
+
+        cuidadoAnimalRateioRepository.saveAll(rateios);
+    }
+
     @Override
-    public List<CuidadoAnimalResponse> listarPorPiquete(Long piqueteId, TipoCuidado tipo, String numeroUsuarioLogado) {
+    public Page<CuidadoAnimalResponse> listarPorPiquete(Long piqueteId, TipoCuidado tipo, LocalDate dataInicio, LocalDate dataFim,
+                                                        int page, int size, String numeroUsuarioLogado) {
         Piquete piquete = piqueteRepository.findById(piqueteId)
                 .orElseThrow(() -> new NotFoundException("Piquete não encontrado"));
         fazendaAcessoHelper.validarAcesso(piquete.getFazenda(), numeroUsuarioLogado);
 
-        return cuidadoAnimalRepository.buscarPorPiqueteETipo(piqueteId, tipo).stream()
-                .map(this::toResponse)
-                .toList();
+        Pageable pageable = PageRequest.of(page, size);
+        return cuidadoAnimalRepository.buscarPorPiqueteTipoEPeriodo(piqueteId, tipo, dataInicio, dataFim, pageable)
+                .map(this::toResponse);
     }
 
     @Override
@@ -97,6 +132,7 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
         CuidadoAnimal cuidado = cuidadoAnimalRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Registro não encontrado"));
         fazendaAcessoHelper.validarAcesso(cuidado.getFazenda(), numeroUsuarioLogado);
+        cuidadoAnimalRateioRepository.deleteByCuidadoAnimalId(id);
         cuidadoAnimalRepository.delete(cuidado);
     }
 

@@ -12,6 +12,7 @@ import com.example.fazendalosardo.repository.animais.PiqueteRepository;
 import com.example.fazendalosardo.service.AnimalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +43,8 @@ public class AnimalServiceImpl implements AnimalService {
         Piquete piquete = piqueteRepository.findById(request.piqueteId())
                 .orElseThrow(() -> new NotFoundException("Piquete não encontrado"));
 
+        Set<String> brincosReservados = new HashSet<>();
+
         List<Animal> animais = request.animais().stream().map(item -> {
             Lote lote = null;
             if (item.loteId() != null) {
@@ -53,10 +58,70 @@ public class AnimalServiceImpl implements AnimalService {
             animal.setPiquete(piquete);
             animal.setFazenda(fazenda);
             animal.setDescricao(item.descricao());
+            animal.setSexo(item.sexo());
+            animal.setPeso(item.peso());
+            animal.setDataNascimento(item.dataNascimento());
+            animal.setRaca(item.raca());
+            animal.setValorCompra(item.valorCompra());
+
+            String brinco = gerarBrincoDisponivel(fazenda.getId(), brincosReservados);
+            brincosReservados.add(brinco);
+            animal.setBrinco(brinco);
+
             return animal;
         }).toList();
 
         return animalRepository.saveAll(animais).stream().map(this::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public AnimalResponse salvar(AnimalRequest request, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaAcessoHelper.buscarComAcesso(request.fazendaId(), numeroUsuarioLogado);
+
+        Piquete piquete = piqueteRepository.findById(request.piqueteId())
+                .orElseThrow(() -> new NotFoundException("Piquete não encontrado"));
+
+        Lote lote = null;
+        if (request.loteId() != null) {
+            lote = loteRepository.findById(request.loteId())
+                    .orElseThrow(() -> new NotFoundException("Lote não encontrado"));
+        }
+
+        Animal animal = new Animal();
+        animal.setTipo(request.tipo());
+        animal.setLote(lote);
+        animal.setPiquete(piquete);
+        animal.setFazenda(fazenda);
+        animal.setDescricao(request.descricao());
+        animal.setSexo(request.sexo());
+        animal.setDataNascimento(request.dataNascimento());
+        animal.setDataCompra(request.dataCompra());
+        animal.setValorCompra(request.valorCompra());
+        animal.setPeso(request.peso());
+        animal.setRaca(request.raca());
+
+        if (request.brinco() != null && !request.brinco().isBlank()) {
+            if (animalRepository.existsByFazendaIdAndBrinco(fazenda.getId(), request.brinco())) {
+                throw new BusinessException("Já existe um animal com esse brinco nesta fazenda");
+            }
+            animal.setBrinco(request.brinco());
+        } else {
+            animal.setBrinco(gerarBrincoDisponivel(fazenda.getId()));
+        }
+
+        Animal salvo = animalRepository.save(animal);
+
+        return toResponse(salvo);
+    }
+
+    @Override
+    public Page<OperacaoVendaResponse> listarOperacoesVenda(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
+                                                            int page, int size, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        Pageable pageable = PageRequest.of(page, size);
+        return operacaoVendaRepository.buscarPorFazendaEPeriodo(fazendaId, dataInicio, dataFim, pageable)
+                .map(this::toResponse);
     }
 
     @Override
@@ -85,12 +150,33 @@ public class AnimalServiceImpl implements AnimalService {
         animal.setDataCompra(request.dataCompra());
         animal.setValorCompra(request.valorCompra());
         animal.setPeso(request.peso());
-        if (request.brinco() != null && !request.brinco().isBlank()) {
-            animal.setBrinco(request.brinco());
-        }
         animal.setRaca(request.raca());
 
+        if (request.brinco() != null && !request.brinco().isBlank()
+                && !request.brinco().equals(animal.getBrinco())) {
+            if (animalRepository.existsByFazendaIdAndBrincoAndIdNot(animal.getFazenda().getId(), request.brinco(), animal.getId())) {
+                throw new BusinessException("Já existe um animal com esse brinco nesta fazenda");
+            }
+            animal.setBrinco(request.brinco());
+        }
+
         return toResponse(animal);
+    }
+
+    private String gerarBrincoDisponivel(Long fazendaId) {
+        return gerarBrincoDisponivel(fazendaId, Set.of());
+    }
+
+    private String gerarBrincoDisponivel(Long fazendaId, Set<String> reservadosNoLote) {
+        long candidato = animalRepository.countByFazendaId(fazendaId) + 1;
+        String brinco = String.valueOf(candidato);
+
+        while (reservadosNoLote.contains(brinco) || animalRepository.existsByFazendaIdAndBrinco(fazendaId, brinco)) {
+            candidato++;
+            brinco = String.valueOf(candidato);
+        }
+
+        return brinco;
     }
 
     @Override

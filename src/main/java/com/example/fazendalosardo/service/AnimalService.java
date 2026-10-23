@@ -5,6 +5,7 @@ import com.example.fazendalosardo.model.enums.TipoAnimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AnimalService {
@@ -27,4 +28,9 @@ public interface AnimalService {
     AnimalCustoResponse calcularCusto(Long animalId, String numeroUsuarioLogado);
 
     List<HistoricoCuidadoAnimalResponse> listarHistorico(Long animalId, String numeroUsuarioLogado);
+
+    AnimalResponse salvar(AnimalRequest request, String numeroUsuarioLogado);
+
+    Page<OperacaoVendaResponse> listarOperacoesVenda(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
+                                                     int page, int size, String numeroUsuarioLogado);
 }

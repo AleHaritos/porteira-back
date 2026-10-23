@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
     long countByLoteIdAndAtivoTrue(Long loteId);
@@ -27,4 +29,14 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
         """)
     Page<Animal> buscarComFiltros(@Param("fazendaId") Long fazendaId, @Param("piqueteId") Long piqueteId,
                                   @Param("loteId") Long loteId, @Param("tipo") TipoAnimal tipo, Pageable pageable);
+
+    List<Animal> findByPiqueteIdAndAtivoTrue(Long piqueteId);
+
+    List<Animal> findByLoteIdAndPiqueteIdAndAtivoTrue(Long loteId, Long piqueteId);
+
+    long countByFazendaId(Long fazendaId);
+
+    boolean existsByFazendaIdAndBrinco(Long fazendaId, String brinco);
+
+    boolean existsByFazendaIdAndBrincoAndIdNot(Long fazendaId, String brinco, Long id);
 }

@@ -7,10 +7,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -51,10 +53,26 @@ public class AnimalController {
         animalService.transferirAnimais(request, authentication.getName());
     }
 
-    // ATENÇÃO: a assinatura mudou — antes retornava void, agora retorna OperacaoVendaResponse
+    @PostMapping
+    public ResponseEntity<AnimalResponse> salvar(@Valid @RequestBody AnimalRequest request,
+                                                 Authentication authentication) {
+        return ResponseEntity.ok(animalService.salvar(request, authentication.getName()));
+    }
+
     @PostMapping("/vender")
     public OperacaoVendaResponse vender(@RequestBody @Valid VendaAnimalRequest request, Authentication authentication) {
         return animalService.venderAnimais(request, authentication.getName());
+    }
+
+    @GetMapping("/vendas/fazenda/{fazendaId}/periodo")
+    public Page<OperacaoVendaResponse> listarOperacoesVendaPorPeriodo(
+            @PathVariable Long fazendaId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Authentication authentication) {
+        return animalService.listarOperacoesVenda(fazendaId, dataInicio, dataFim, page, size, authentication.getName());
     }
 
     @GetMapping("/vendas/fazenda/{fazendaId}")

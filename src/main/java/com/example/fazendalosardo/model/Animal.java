@@ -65,11 +65,4 @@ public class Animal {
             this.ativo = true;
         }
     }
-
-    @PostPersist
-    private void gerarBrincoPadrao() {
-        if (this.brinco == null || this.brinco.isBlank()) {
-            this.brinco = String.valueOf(this.id);
-        }
-    }
 }
