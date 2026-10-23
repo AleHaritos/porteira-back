@@ -1,0 +1,10 @@
+package com.example.fazendalosardo.repository.animais;
+
+import com.example.fazendalosardo.model.Ingrediente;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface IngredienteRepository extends JpaRepository<Ingrediente, Long> {
+    List<Ingrediente> findByFazendaIdAndAtivoTrueOrderByNome(Long fazendaId);
+}

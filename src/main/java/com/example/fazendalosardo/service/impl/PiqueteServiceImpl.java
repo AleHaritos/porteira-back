@@ -67,7 +67,7 @@ public class PiqueteServiceImpl implements PiqueteService {
     }
 
     private PiqueteResponse toResponse(Piquete piquete) {
-        long quantidadeAnimais = animalRepository.countByPiqueteId(piquete.getId());
+        long quantidadeAnimais = animalRepository.countByPiqueteIdAndAtivoTrue(piquete.getId());
         return new PiqueteResponse(
                 piquete.getId(),
                 piquete.getNome(),

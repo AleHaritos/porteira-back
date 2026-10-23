@@ -20,8 +20,7 @@ public record CuidadoAnimalResponse(
         String loteNome,
         Long piqueteId,
         String piqueteNome,
-        Long negocioId,
-        String negocioNome,
-        Long safraId,
-        String safraNome
+        Long racaoId,
+        String racaoNome,
+        BigDecimal quantidadeRacao
 ) {}

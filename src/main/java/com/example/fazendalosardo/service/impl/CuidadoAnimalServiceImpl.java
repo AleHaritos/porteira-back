@@ -6,11 +6,7 @@ import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.*;
 import com.example.fazendalosardo.model.enums.TipoCuidado;
-import com.example.fazendalosardo.model.safras.Safra;
-import com.example.fazendalosardo.repository.animais.AnimalRepository;
-import com.example.fazendalosardo.repository.animais.CuidadoAnimalRepository;
-import com.example.fazendalosardo.repository.animais.LoteRepository;
-import com.example.fazendalosardo.repository.animais.PiqueteRepository;
+import com.example.fazendalosardo.repository.animais.*;
 import com.example.fazendalosardo.service.CuidadoAnimalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +23,7 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
     private final LoteRepository loteRepository;
     private final PiqueteRepository piqueteRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
-    private final VeiculoTransacaoHelper transacaoHelper;
+    private final RacaoRepository racaoRepository;
 
     @Override
     @Transactional
@@ -36,10 +32,6 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
 
         Piquete piquete = piqueteRepository.findById(request.piqueteId())
                 .orElseThrow(() -> new NotFoundException("Piquete não encontrado"));
-
-        transacaoHelper.validarVinculoXor(request.negocioId(), request.safraId());
-        Negocio negocio = transacaoHelper.buscarNegocio(request.negocioId());
-        Safra safra = transacaoHelper.buscarSafra(request.safraId());
 
         Animal animal = null;
         Lote lote = null;
@@ -74,17 +66,16 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
         cuidado.setLote(lote);
         cuidado.setPiquete(piquete);
         cuidado.setFazenda(fazenda);
-        cuidado.setNegocio(negocio);
-        cuidado.setSafra(safra);
+
+        Racao racao = null;
+        if (request.racaoId() != null) {
+            racao = racaoRepository.findById(request.racaoId())
+                    .orElseThrow(() -> new NotFoundException("Ração não encontrada"));
+        }
+        cuidado.setRacao(racao);
+        cuidado.setQuantidadeRacao(request.quantidadeRacao());
 
         cuidadoAnimalRepository.save(cuidado);
-
-        String prefixo = request.tipo() == TipoCuidado.VACINACAO ? "Vacinação" : "Alimentação";
-        String descricaoTransacao = prefixo
-                + (request.descricao() != null && !request.descricao().isBlank() ? " - " + request.descricao() : "")
-                + " - " + piquete.getNome();
-
-        transacaoHelper.gerarTransacaoGasto(fazenda, negocio, safra, request.custo(), request.data(), descricaoTransacao);
 
         return toResponse(cuidado);
     }
@@ -124,10 +115,9 @@ public class CuidadoAnimalServiceImpl implements CuidadoAnimalService {
                 cuidado.getLote() != null ? cuidado.getLote().getNome() : null,
                 cuidado.getPiquete().getId(),
                 cuidado.getPiquete().getNome(),
-                cuidado.getNegocio() != null ? cuidado.getNegocio().getId() : null,
-                cuidado.getNegocio() != null ? cuidado.getNegocio().getNome() : null,
-                cuidado.getSafra() != null ? cuidado.getSafra().getId() : null,
-                cuidado.getSafra() != null ? cuidado.getSafra().getNome() : null
+                cuidado.getRacao() != null ? cuidado.getRacao().getId() : null,
+                cuidado.getRacao() != null ? cuidado.getRacao().getNome() : null,
+                cuidado.getQuantidadeRacao()
         );
     }
 }

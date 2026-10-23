@@ -1,9 +1,6 @@
 package com.example.fazendalosardo.controller;
 
-import com.example.fazendalosardo.dto.animais.AnimalEmMassaRequest;
-import com.example.fazendalosardo.dto.animais.AnimalRequest;
-import com.example.fazendalosardo.dto.animais.AnimalResponse;
-import com.example.fazendalosardo.dto.animais.VendaAnimalRequest;
+import com.example.fazendalosardo.dto.animais.*;
 import com.example.fazendalosardo.model.enums.TipoAnimal;
 import com.example.fazendalosardo.service.AnimalService;
 import jakarta.validation.Valid;
@@ -49,9 +46,30 @@ public class AnimalController {
         return ResponseEntity.ok(resultado);
     }
 
+    @PostMapping("/transferir")
+    public void transferir(@RequestBody @Valid TransferenciaAnimalRequest request, Authentication authentication) {
+        animalService.transferirAnimais(request, authentication.getName());
+    }
+
+    // ATENÇÃO: a assinatura mudou — antes retornava void, agora retorna OperacaoVendaResponse
     @PostMapping("/vender")
-    public void vender(@RequestBody @Valid VendaAnimalRequest request, Authentication authentication) {
-        animalService.venderAnimais(request, authentication.getName());
+    public OperacaoVendaResponse vender(@RequestBody @Valid VendaAnimalRequest request, Authentication authentication) {
+        return animalService.venderAnimais(request, authentication.getName());
+    }
+
+    @GetMapping("/vendas/fazenda/{fazendaId}")
+    public List<OperacaoVendaResponse> listarOperacoesVenda(@PathVariable Long fazendaId, Authentication authentication) {
+        return animalService.listarOperacoesVenda(fazendaId, authentication.getName());
+    }
+
+    @GetMapping("/{id}/custo")
+    public AnimalCustoResponse calcularCusto(@PathVariable Long id, Authentication authentication) {
+        return animalService.calcularCusto(id, authentication.getName());
+    }
+
+    @GetMapping("/{id}/historico")
+    public List<HistoricoCuidadoAnimalResponse> listarHistorico(@PathVariable Long id, Authentication authentication) {
+        return animalService.listarHistorico(id, authentication.getName());
     }
 
     @DeleteMapping("/{id}")

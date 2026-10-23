@@ -1,20 +1,13 @@
 package com.example.fazendalosardo.service.impl;
 
-import com.example.fazendalosardo.dto.animais.AnimalEmMassaRequest;
-import com.example.fazendalosardo.dto.animais.AnimalRequest;
-import com.example.fazendalosardo.dto.animais.AnimalResponse;
-import com.example.fazendalosardo.dto.animais.VendaAnimalRequest;
+import com.example.fazendalosardo.dto.animais.*;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
-import com.example.fazendalosardo.model.Animal;
-import com.example.fazendalosardo.model.Fazenda;
-import com.example.fazendalosardo.model.Lote;
-import com.example.fazendalosardo.model.Negocio;
-import com.example.fazendalosardo.model.Piquete;
+import com.example.fazendalosardo.model.*;
 import com.example.fazendalosardo.model.enums.TipoAnimal;
-import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.animais.AnimalRepository;
 import com.example.fazendalosardo.repository.animais.LoteRepository;
+import com.example.fazendalosardo.repository.animais.OperacaoVendaRepository;
 import com.example.fazendalosardo.repository.animais.PiqueteRepository;
 import com.example.fazendalosardo.service.AnimalService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -32,8 +28,9 @@ public class AnimalServiceImpl implements AnimalService {
     private final AnimalRepository animalRepository;
     private final LoteRepository loteRepository;
     private final PiqueteRepository piqueteRepository;
+    private final OperacaoVendaRepository operacaoVendaRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
-    private final VeiculoTransacaoHelper transacaoHelper;
+    private final AnimalCustoHelper animalCustoHelper;
 
     @Override
     @Transactional
@@ -83,6 +80,15 @@ public class AnimalServiceImpl implements AnimalService {
         animal.setLote(lote);
         animal.setPiquete(piquete);
         animal.setDescricao(request.descricao());
+        animal.setSexo(request.sexo());
+        animal.setDataNascimento(request.dataNascimento());
+        animal.setDataCompra(request.dataCompra());
+        animal.setValorCompra(request.valorCompra());
+        animal.setPeso(request.peso());
+        if (request.brinco() != null && !request.brinco().isBlank()) {
+            animal.setBrinco(request.brinco());
+        }
+        animal.setRaca(request.raca());
 
         return toResponse(animal);
     }
@@ -106,12 +112,15 @@ public class AnimalServiceImpl implements AnimalService {
 
     @Override
     @Transactional
-    public void venderAnimais(VendaAnimalRequest request, String numeroUsuarioLogado) {
+    public void transferirAnimais(TransferenciaAnimalRequest request, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaAcessoHelper.buscarComAcesso(request.fazendaId(), numeroUsuarioLogado);
 
-        transacaoHelper.validarVinculoXor(request.negocioId(), request.safraId());
-        Negocio negocio = transacaoHelper.buscarNegocio(request.negocioId());
-        Safra safra = transacaoHelper.buscarSafra(request.safraId());
+        Piquete piqueteDestino = piqueteRepository.findById(request.piqueteDestinoId())
+                .orElseThrow(() -> new NotFoundException("Piquete de destino não encontrado"));
+
+        if (!piqueteDestino.getFazenda().getId().equals(fazenda.getId())) {
+            throw new BusinessException("O piquete de destino não pertence à fazenda informada");
+        }
 
         List<Animal> animais = animalRepository.findAllById(request.animalIds());
 
@@ -125,15 +134,86 @@ public class AnimalServiceImpl implements AnimalService {
             throw new BusinessException("Todos os animais devem pertencer à fazenda informada");
         }
 
-        String descricaoTransacao = "Venda de " + animais.size() + " animal(is)"
-                + (request.descricao() != null && !request.descricao().isBlank() ? " - " + request.descricao() : "");
+        animais.forEach(a -> a.setPiquete(piqueteDestino));
+    }
 
-        transacaoHelper.gerarTransacaoReceita(fazenda, negocio, safra, request.valor(), request.data(), descricaoTransacao);
+    @Override
+    @Transactional
+    public OperacaoVendaResponse venderAnimais(VendaAnimalRequest request, String numeroUsuarioLogado) {
+        Fazenda fazenda = fazendaAcessoHelper.buscarComAcesso(request.fazendaId(), numeroUsuarioLogado);
 
-        animalRepository.deleteAll(animais);
+        List<Animal> animais = animalRepository.findAllById(request.animalIds());
+
+        if (animais.size() != request.animalIds().size()) {
+            throw new NotFoundException("Um ou mais animais não foram encontrados");
+        }
+
+        boolean algumDeOutraFazenda = animais.stream()
+                .anyMatch(a -> !a.getFazenda().getId().equals(fazenda.getId()));
+        if (algumDeOutraFazenda) {
+            throw new BusinessException("Todos os animais devem pertencer à fazenda informada");
+        }
+
+        OperacaoVenda operacao = new OperacaoVenda();
+        operacao.setFazenda(fazenda);
+        operacao.setData(request.data());
+        operacao.setDescricao(request.descricao());
+        operacao.setValorVenda(request.valor());
+
+        BigDecimal custoTotalOperacao = BigDecimal.ZERO;
+
+        for (Animal animal : animais) {
+            AnimalCustoResponse custo = animalCustoHelper.calcularCusto(animal);
+
+            OperacaoVendaItem item = new OperacaoVendaItem();
+            item.setOperacaoVenda(operacao);
+            item.setAnimal(animal);
+            item.setCustoVacinacao(custo.custoVacinacao());
+            item.setCustoAlimentacao(custo.custoAlimentacao());
+            item.setValorCompra(custo.valorCompra());
+            item.setCustoTotal(custo.custoTotal());
+
+            operacao.getItens().add(item);
+            custoTotalOperacao = custoTotalOperacao.add(custo.custoTotal());
+
+            animal.setAtivo(false);
+        }
+
+        operacao.setCustoTotal(custoTotalOperacao);
+        operacao.setLucro(request.valor().subtract(custoTotalOperacao));
+
+        operacaoVendaRepository.save(operacao);
+
+        return toResponse(operacao);
+    }
+
+    @Override
+    public List<OperacaoVendaResponse> listarOperacoesVenda(Long fazendaId, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return operacaoVendaRepository.buscarPorFazenda(fazendaId).stream().map(this::toResponse).toList();
+    }
+
+    @Override
+    public AnimalCustoResponse calcularCusto(Long animalId, String numeroUsuarioLogado) {
+        Animal animal = animalRepository.findById(animalId)
+                .orElseThrow(() -> new NotFoundException("Animal não encontrado"));
+        fazendaAcessoHelper.validarAcesso(animal.getFazenda(), numeroUsuarioLogado);
+        return animalCustoHelper.calcularCusto(animal);
+    }
+
+    @Override
+    public List<HistoricoCuidadoAnimalResponse> listarHistorico(Long animalId, String numeroUsuarioLogado) {
+        Animal animal = animalRepository.findById(animalId)
+                .orElseThrow(() -> new NotFoundException("Animal não encontrado"));
+        fazendaAcessoHelper.validarAcesso(animal.getFazenda(), numeroUsuarioLogado);
+        return animalCustoHelper.listarHistorico(animal);
     }
 
     private AnimalResponse toResponse(Animal animal) {
+        Integer idadeMeses = animal.getDataNascimento() != null
+                ? (int) ChronoUnit.MONTHS.between(animal.getDataNascimento(), LocalDate.now())
+                : null;
+
         return new AnimalResponse(
                 animal.getId(),
                 animal.getTipo(),
@@ -141,7 +221,41 @@ public class AnimalServiceImpl implements AnimalService {
                 animal.getLote() != null ? animal.getLote().getNome() : null,
                 animal.getPiquete().getId(),
                 animal.getPiquete().getNome(),
-                animal.getDescricao()
+                animal.getDescricao(),
+                animal.getAtivo(),
+                animal.getSexo(),
+                animal.getDataNascimento(),
+                idadeMeses,
+                animal.getDataCompra(),
+                animal.getValorCompra(),
+                animal.getPeso(),
+                animal.getBrinco(),
+                animal.getRaca()
+        );
+    }
+
+    private OperacaoVendaResponse toResponse(OperacaoVenda operacao) {
+        List<OperacaoVendaItemResponse> itens = operacao.getItens().stream()
+                .map(item -> new OperacaoVendaItemResponse(
+                        item.getAnimal() != null ? item.getAnimal().getId() : null,
+                        item.getAnimal() != null ? item.getAnimal().getTipo().name() : null,
+                        item.getAnimal() != null ? item.getAnimal().getDescricao() : null,
+                        item.getAnimal() != null ? item.getAnimal().getBrinco() : null,
+                        item.getCustoVacinacao(),
+                        item.getCustoAlimentacao(),
+                        item.getValorCompra(),
+                        item.getCustoTotal()
+                ))
+                .toList();
+
+        return new OperacaoVendaResponse(
+                operacao.getId(),
+                operacao.getData(),
+                operacao.getDescricao(),
+                operacao.getValorVenda(),
+                operacao.getCustoTotal(),
+                operacao.getLucro(),
+                itens
         );
     }
 }

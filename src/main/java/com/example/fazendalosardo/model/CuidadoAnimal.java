@@ -2,7 +2,6 @@ package com.example.fazendalosardo.model;
 
 import com.example.fazendalosardo.model.enums.TipoCuidado;
 import com.example.fazendalosardo.model.enums.TipoVinculoCuidado;
-import com.example.fazendalosardo.model.safras.Safra;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,10 +56,9 @@ public class CuidadoAnimal {
     private Fazenda fazenda;
 
     @ManyToOne
-    @JoinColumn(name = "negocio_id")
-    private Negocio negocio;
+    @JoinColumn(name = "racao_id")
+    private Racao racao;
 
-    @ManyToOne
-    @JoinColumn(name = "safra_id")
-    private Safra safra;
+    @Column(name = "quantidade_racao")
+    private BigDecimal quantidadeRacao;
 }

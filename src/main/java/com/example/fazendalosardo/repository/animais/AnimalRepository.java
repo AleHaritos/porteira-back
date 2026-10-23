@@ -10,24 +10,21 @@ import org.springframework.data.repository.query.Param;
 
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 
-    long countByLoteId(Long loteId);
+    long countByLoteIdAndAtivoTrue(Long loteId);
 
-    long countByPiqueteId(Long piqueteId);
+    long countByPiqueteIdAndAtivoTrue(Long piqueteId);
 
     @Query("""
         SELECT a FROM Animal a
         LEFT JOIN FETCH a.lote
         LEFT JOIN FETCH a.piquete
         WHERE a.fazenda.id = :fazendaId
+        AND a.ativo = true
         AND (:piqueteId IS NULL OR a.piquete.id = :piqueteId)
         AND (:loteId IS NULL OR a.lote.id = :loteId)
         AND (:tipo IS NULL OR a.tipo = :tipo)
         ORDER BY a.id DESC
         """)
-    Page<Animal> buscarComFiltros(
-            @Param("fazendaId") Long fazendaId,
-            @Param("piqueteId") Long piqueteId,
-            @Param("loteId") Long loteId,
-            @Param("tipo") TipoAnimal tipo,
-            Pageable pageable);
+    Page<Animal> buscarComFiltros(@Param("fazendaId") Long fazendaId, @Param("piqueteId") Long piqueteId,
+                                  @Param("loteId") Long loteId, @Param("tipo") TipoAnimal tipo, Pageable pageable);
 }

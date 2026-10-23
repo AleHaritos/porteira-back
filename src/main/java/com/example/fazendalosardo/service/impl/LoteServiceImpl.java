@@ -67,7 +67,7 @@ public class LoteServiceImpl implements LoteService {
     }
 
     private LoteResponse toResponse(Lote lote) {
-        long quantidadeAnimais = animalRepository.countByLoteId(lote.getId());
+        long quantidadeAnimais = animalRepository.countByLoteIdAndAtivoTrue(lote.getId());
         return new LoteResponse(
                 lote.getId(),
                 lote.getNome(),

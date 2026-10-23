@@ -18,6 +18,6 @@ public record CuidadoAnimalRequest(
         Long loteId,
         @NotNull Long piqueteId,
         @NotNull Long fazendaId,
-        Long negocioId,
-        Long safraId
+        Long racaoId,
+        BigDecimal quantidadeRacao
 ) {}
