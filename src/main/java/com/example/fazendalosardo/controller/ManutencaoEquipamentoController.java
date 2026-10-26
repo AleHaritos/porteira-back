@@ -2,6 +2,7 @@ package com.example.fazendalosardo.controller;
 
 import com.example.fazendalosardo.dto.equipamento.ManutencaoEquipamentoRequest;
 import com.example.fazendalosardo.dto.equipamento.ManutencaoEquipamentoResponse;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.service.ManutencaoEquipamentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,17 @@ public class ManutencaoEquipamentoController {
         return ResponseEntity.ok(manutencaoEquipamentoService.salvar(request, authentication.getName()));
     }
 
+    @GetMapping("/fazenda/{fazendaId}")
+    public ResponseEntity<Page<ManutencaoEquipamentoResponse>> buscarPorFazenda(
+            @PathVariable Long fazendaId,
+            @RequestParam(required = false) Long equipamentoId,
+            @RequestParam(required = false) LocalDate dataInicio,
+            @RequestParam(required = false) LocalDate dataFim,
+            Pageable pageable,
+            Authentication authentication) {
+        return ResponseEntity.ok(manutencaoEquipamentoService.buscarPorFazenda(fazendaId, equipamentoId, dataInicio, dataFim, pageable, authentication.getName()));
+    }
+
     @GetMapping("/equipamento/{equipamentoId}")
     public ResponseEntity<Page<ManutencaoEquipamentoResponse>> buscarPorEquipamento(@PathVariable Long equipamentoId, Pageable pageable,
                                                                                     Authentication authentication) {
@@ -38,6 +50,14 @@ public class ManutencaoEquipamentoController {
     public ResponseEntity<List<ManutencaoEquipamentoResponse>> listarPendentesPorFornecedor(@PathVariable Long fornecedorId,
                                                                                             Authentication authentication) {
         return ResponseEntity.ok(manutencaoEquipamentoService.listarPendentesPorFornecedor(fornecedorId, authentication.getName()));
+    }
+
+    @GetMapping("/fornecedor/{fornecedorId}")
+    public ResponseEntity<List<ManutencaoEquipamentoResponse>> listarPorFornecedorEStatus(
+            @PathVariable Long fornecedorId,
+            @RequestParam StatusParcela status,
+            Authentication authentication) {
+        return ResponseEntity.ok(manutencaoEquipamentoService.listarPorFornecedorEStatus(fornecedorId, status, authentication.getName()));
     }
 
     @PatchMapping("/{id}/baixa")

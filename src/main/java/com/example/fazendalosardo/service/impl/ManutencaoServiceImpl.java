@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.veiculos.ManutencaoRequest;
 import com.example.fazendalosardo.dto.veiculos.ManutencaoResponse;
+import com.example.fazendalosardo.dto.veiculos.ManutencaoResumoResponse;
 import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.*;
@@ -92,6 +93,40 @@ public class ManutencaoServiceImpl implements ManutencaoService {
                 .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
         fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
         return manutencaoRepository.listarPendentesPorFornecedor(fornecedorId, StatusParcela.PENDENTE)
+                .stream().map(ManutencaoResponse::de).toList();
+    }
+
+    @Override
+    public Page<ManutencaoResponse> buscarPorVeiculoEPeriodo(Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
+                                                             Pageable pageable, String numeroUsuarioLogado) {
+        Veiculo veiculo = veiculoRepository.findById(veiculoId)
+                .orElseThrow(() -> new NotFoundException("Veículo não encontrado"));
+        fazendaAcessoHelper.validarAcesso(veiculo.getFazenda(), numeroUsuarioLogado);
+        return manutencaoRepository.buscarPorVeiculoEPeriodo(veiculoId, dataInicio, dataFim, pageable).map(ManutencaoResponse::de);
+    }
+
+    @Override
+    public ManutencaoResumoResponse buscarResumoPorVeiculo(Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
+                                                           String numeroUsuarioLogado) {
+        Veiculo veiculo = veiculoRepository.findById(veiculoId)
+                .orElseThrow(() -> new NotFoundException("Veículo não encontrado"));
+        fazendaAcessoHelper.validarAcesso(veiculo.getFazenda(), numeroUsuarioLogado);
+        return manutencaoRepository.buscarResumoPorVeiculo(veiculoId, dataInicio, dataFim);
+    }
+
+    @Override
+    public Page<ManutencaoResponse> buscarPorFazenda(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
+                                                     Pageable pageable, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return manutencaoRepository.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, pageable).map(ManutencaoResponse::de);
+    }
+
+    @Override
+    public List<ManutencaoResponse> listarPorFornecedorEStatus(Long fornecedorId, StatusParcela status, String numeroUsuarioLogado) {
+        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
+                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
+        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
+        return manutencaoRepository.listarPendentesPorFornecedor(fornecedorId, status)
                 .stream().map(ManutencaoResponse::de).toList();
     }
 

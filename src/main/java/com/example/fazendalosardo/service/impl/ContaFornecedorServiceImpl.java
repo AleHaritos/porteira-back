@@ -86,4 +86,13 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
 
         return ContaFornecedorResponse.de(contaFornecedorRepository.save(conta));
     }
+
+    @Override
+    public List<ContaFornecedorResponse> listarPorFornecedorEStatus(Long fornecedorId, StatusParcela status, String numeroUsuarioLogado) {
+        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
+                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
+        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
+        return contaFornecedorRepository.listarPendentesPorFornecedor(fornecedorId, status)
+                .stream().map(ContaFornecedorResponse::de).toList();
+    }
 }

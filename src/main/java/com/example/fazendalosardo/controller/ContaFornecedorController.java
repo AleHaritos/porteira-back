@@ -2,6 +2,7 @@ package com.example.fazendalosardo.controller;
 
 import com.example.fazendalosardo.dto.equipamento.ContaFornecedorRequest;
 import com.example.fazendalosardo.dto.equipamento.ContaFornecedorResponse;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.service.ContaFornecedorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,14 @@ public class ContaFornecedorController {
     public ResponseEntity<List<ContaFornecedorResponse>> listarPendentesPorFornecedor(@PathVariable Long fornecedorId,
                                                                                       Authentication authentication) {
         return ResponseEntity.ok(contaFornecedorService.listarPendentesPorFornecedor(fornecedorId, authentication.getName()));
+    }
+
+    @GetMapping("/fornecedor/{fornecedorId}")
+    public ResponseEntity<List<ContaFornecedorResponse>> listarPorFornecedorEStatus(
+            @PathVariable Long fornecedorId,
+            @RequestParam StatusParcela status,
+            Authentication authentication) {
+        return ResponseEntity.ok(contaFornecedorService.listarPorFornecedorEStatus(fornecedorId, status, authentication.getName()));
     }
 
     @PatchMapping("/{id}/baixa")

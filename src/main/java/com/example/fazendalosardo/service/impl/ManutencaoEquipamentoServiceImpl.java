@@ -94,6 +94,23 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
     }
 
     @Override
+    public Page<ManutencaoEquipamentoResponse> buscarPorFazenda(Long fazendaId, Long equipamentoId, LocalDate dataInicio, LocalDate dataFim,
+                                                                Pageable pageable, String numeroUsuarioLogado) {
+        fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
+        return manutencaoEquipamentoRepository.buscarPorFazenda(fazendaId, equipamentoId, dataInicio, dataFim, pageable)
+                .map(ManutencaoEquipamentoResponse::de);
+    }
+
+    @Override
+    public List<ManutencaoEquipamentoResponse> listarPorFornecedorEStatus(Long fornecedorId, StatusParcela status, String numeroUsuarioLogado) {
+        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
+                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
+        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
+        return manutencaoEquipamentoRepository.listarPendentesPorFornecedor(fornecedorId, status)
+                .stream().map(ManutencaoEquipamentoResponse::de).toList();
+    }
+
+    @Override
     public ManutencaoEquipamentoResponse darBaixa(Long manutencaoId, LocalDate dataBaixa, String numeroUsuarioLogado) {
         ManutencaoEquipamento manutencao = manutencaoEquipamentoRepository.findById(manutencaoId)
                 .orElseThrow(() -> new NotFoundException("Manutenção não encontrada"));
