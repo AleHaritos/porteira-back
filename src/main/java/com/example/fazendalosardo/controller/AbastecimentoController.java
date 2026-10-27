@@ -3,6 +3,7 @@ package com.example.fazendalosardo.controller;
 import com.example.fazendalosardo.dto.veiculos.AbastecimentoRequest;
 import com.example.fazendalosardo.dto.veiculos.AbastecimentoResponse;
 import com.example.fazendalosardo.dto.veiculos.AbastecimentoResumoResponse;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.service.AbastecimentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,9 +59,13 @@ public class AbastecimentoController {
     }
 
     @GetMapping("/posto/{postoId}")
-    public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPosto(@PathVariable Long postoId, Pageable pageable,
+    public ResponseEntity<Page<AbastecimentoResponse>> buscarPorPosto(@PathVariable Long postoId,
+                                                                      @RequestParam(required = false) StatusParcela statusPagamento,
+                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+                                                                      Pageable pageable,
                                                                       Authentication authentication) {
-        return ResponseEntity.ok(abastecimentoService.buscarPorPosto(postoId, pageable, authentication.getName()));
+        return ResponseEntity.ok(abastecimentoService.buscarPorPosto(postoId, statusPagamento, dataInicio, dataFim, pageable, authentication.getName()));
     }
 
     @PatchMapping("/{id}/baixa")

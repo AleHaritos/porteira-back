@@ -136,8 +136,6 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
                 .orElseThrow(() -> new NotFoundException("Posto não encontrado"));
 
         BigDecimal valorTotal = request.litros().multiply(request.valorPorLitro());
-        posto.setSaldoDevedor(posto.getSaldoDevedor().add(valorTotal));
-        postoRepository.save(posto);
 
         abastecimento.setPosto(posto);
         abastecimento.setValorPorLitro(request.valorPorLitro());
@@ -154,11 +152,13 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
     }
 
     @Override
-    public Page<AbastecimentoResponse> buscarPorPosto(Long postoId, Pageable pageable, String numeroUsuarioLogado) {
+    public Page<AbastecimentoResponse> buscarPorPosto(Long postoId, StatusParcela statusPagamento, LocalDate dataInicio,
+                                                      LocalDate dataFim, Pageable pageable, String numeroUsuarioLogado) {
         Posto posto = postoRepository.findById(postoId)
                 .orElseThrow(() -> new NotFoundException("Posto não encontrado"));
         fazendaAcessoHelper.validarAcesso(posto.getFazenda(), numeroUsuarioLogado);
-        return abastecimentoRepository.buscarPorPosto(postoId, pageable).map(AbastecimentoResponse::de);
+        return abastecimentoRepository.buscarPorPosto(postoId, statusPagamento, dataInicio, dataFim, pageable)
+                .map(AbastecimentoResponse::de);
     }
 
     @Override
@@ -187,9 +187,6 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setTransacao(transacao);
         abastecimento.setStatusPagamento(StatusParcela.BAIXADO);
         abastecimento.setDataBaixa(dataEfetiva);
-
-        posto.setSaldoDevedor(posto.getSaldoDevedor().subtract(abastecimento.getValorTotal()));
-        postoRepository.save(posto);
 
         return AbastecimentoResponse.de(abastecimentoRepository.save(abastecimento));
     }

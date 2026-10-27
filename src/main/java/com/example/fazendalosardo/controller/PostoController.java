@@ -1,6 +1,5 @@
 package com.example.fazendalosardo.controller;
 
-import com.example.fazendalosardo.dto.veiculos.PostoPagamentoRequest;
 import com.example.fazendalosardo.dto.veiculos.PostoRequest;
 import com.example.fazendalosardo.dto.veiculos.PostoResponse;
 import com.example.fazendalosardo.service.PostoService;
@@ -37,9 +36,9 @@ public class PostoController {
         return ResponseEntity.ok(postoService.listarTodosPorFazenda(fazendaId, authentication.getName()));
     }
 
-    @PostMapping("/{id}/pagamento")
-    public ResponseEntity<PostoResponse> registrarPagamento(@PathVariable Long id, @Valid @RequestBody PostoPagamentoRequest request,
-                                                            Authentication authentication) {
-        return ResponseEntity.ok(postoService.registrarPagamento(id, request, authentication.getName()));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id, Authentication authentication) {
+        postoService.excluir(id, authentication.getName());
+        return ResponseEntity.noContent().build();
     }
 }

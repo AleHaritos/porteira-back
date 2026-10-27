@@ -1,6 +1,5 @@
 package com.example.fazendalosardo.service;
 
-import com.example.fazendalosardo.dto.veiculos.PostoPagamentoRequest;
 import com.example.fazendalosardo.dto.veiculos.PostoRequest;
 import com.example.fazendalosardo.dto.veiculos.PostoResponse;
 import org.springframework.data.domain.Page;
@@ -12,5 +11,5 @@ public interface PostoService {
     PostoResponse salvar(PostoRequest request, String numeroUsuarioLogado);
     Page<PostoResponse> listarPorFazenda(Long fazendaId, Pageable pageable, String numeroUsuarioLogado);
     List<PostoResponse> listarTodosPorFazenda(Long fazendaId, String numeroUsuarioLogado);
-    PostoResponse registrarPagamento(Long postoId, PostoPagamentoRequest request, String numeroUsuarioLogado);
+    void excluir(Long postoId, String numeroUsuarioLogado);
 }

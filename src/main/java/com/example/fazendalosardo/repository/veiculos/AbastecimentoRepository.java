@@ -2,6 +2,7 @@ package com.example.fazendalosardo.repository.veiculos;
 
 import com.example.fazendalosardo.dto.veiculos.AbastecimentoResumoResponse;
 import com.example.fazendalosardo.model.Abastecimento;
+import com.example.fazendalosardo.model.enums.StatusParcela;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,8 +17,28 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
     @Query("SELECT a FROM Abastecimento a WHERE a.veiculo.id = :veiculoId AND a.ativo = true ORDER BY a.data DESC")
     Page<Abastecimento> buscarPorVeiculo(@Param("veiculoId") Long veiculoId, Pageable pageable);
 
-    @Query("SELECT a FROM Abastecimento a WHERE a.posto.id = :postoId AND a.ativo = true ORDER BY a.data DESC")
-    Page<Abastecimento> buscarPorPosto(@Param("postoId") Long postoId, Pageable pageable);
+    @Query("""
+        SELECT a FROM Abastecimento a
+        WHERE a.posto.id = :postoId
+          AND a.ativo = true
+          AND (:statusPagamento IS NULL OR a.statusPagamento = :statusPagamento)
+          AND (CAST(:dataInicio AS date) IS NULL OR a.data >= :dataInicio)
+          AND (CAST(:dataFim AS date) IS NULL OR a.data <= :dataFim)
+        ORDER BY a.data DESC
+        """)
+    Page<Abastecimento> buscarPorPosto(@Param("postoId") Long postoId,
+                                       @Param("statusPagamento") StatusParcela statusPagamento,
+                                       @Param("dataInicio") LocalDate dataInicio,
+                                       @Param("dataFim") LocalDate dataFim,
+                                       Pageable pageable);
+
+    @Query("""
+        SELECT COALESCE(SUM(a.valorTotal), 0) FROM Abastecimento a
+        WHERE a.posto.id = :postoId
+          AND a.statusPagamento = com.example.fazendalosardo.model.enums.StatusParcela.PENDENTE
+          AND a.ativo = true
+        """)
+    BigDecimal somarPendentePorPosto(@Param("postoId") Long postoId);
 
     @Query("""
             SELECT a FROM Abastecimento a
