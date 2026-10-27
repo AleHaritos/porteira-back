@@ -25,4 +25,6 @@ public interface ManutencaoService {
                                               Pageable pageable, String numeroUsuarioLogado);
 
     List<ManutencaoResponse> listarPorFornecedorEStatus(Long fornecedorId, StatusParcela status, String numeroUsuarioLogado);
+
+    void excluir(Long manutencaoId, String numeroUsuarioLogado);
 }

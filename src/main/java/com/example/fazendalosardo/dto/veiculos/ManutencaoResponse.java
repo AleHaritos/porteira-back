@@ -21,7 +21,10 @@ public record ManutencaoResponse(
         String fornecedorNome,
         String vinculoNome,
         String statusPagamento,
-        LocalDate dataBaixa
+        LocalDate dataBaixa,
+        String origem,
+        Integer numeroParcela,
+        Integer totalParcelas
 ) {
     public static ManutencaoResponse de(Manutencao m) {
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
@@ -30,6 +33,15 @@ public record ManutencaoResponse(
         return new ManutencaoResponse(m.getId(), m.getVeiculo().getId(), m.getVeiculo().getNome(),
                 m.getTipo(), m.getDescricao(), m.getData(), m.getValor(), m.getKmAtual(), m.getObservacao(),
                 m.getFormaPagamento(), fornecedorNome, vinculo,
-                m.getStatusPagamento().name(), m.getDataBaixa());
+                m.getStatusPagamento().name(), m.getDataBaixa(), "SIMPLES", null, null);
+    }
+
+    public static ManutencaoResponse deListagem(ManutencaoListagemRow row) {
+        return new ManutencaoResponse(
+                row.id(), null, row.ativoNome(), TipoManutencao.valueOf(row.tipo()), row.descricao(),
+                row.data(), row.valor(), row.kmAtual(), null,
+                FormaPagamentoManutencao.valueOf(row.formaPagamento()), row.fornecedorNome(), row.vinculoNome(),
+                row.statusPagamento(), row.dataBaixa(), row.origem(), row.numeroParcela(), row.totalParcelas()
+        );
     }
 }

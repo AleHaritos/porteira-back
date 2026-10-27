@@ -18,7 +18,7 @@ public interface ManutencaoRepository extends JpaRepository<Manutencao, Long> {
     @Query("SELECT m FROM Manutencao m WHERE m.veiculo.id = :veiculoId AND m.ativo = true ORDER BY m.data DESC")
     Page<Manutencao> buscarPorVeiculo(@Param("veiculoId") Long veiculoId, Pageable pageable);
 
-    @Query("SELECT m FROM Manutencao m WHERE m.fornecedor.id = :fornecedorId AND m.statusPagamento = :status ORDER BY m.data DESC")
+    @Query("SELECT m FROM Manutencao m WHERE m.fornecedor.id = :fornecedorId AND m.statusPagamento = :status AND m.ativo = true ORDER BY m.data DESC")
     List<Manutencao> listarPendentesPorFornecedor(@Param("fornecedorId") Long fornecedorId, @Param("status") StatusParcela status);
 
     @Query("SELECT COALESCE(SUM(m.valor), 0) FROM Manutencao m WHERE m.safra.id = :safraId AND m.ativo = true")

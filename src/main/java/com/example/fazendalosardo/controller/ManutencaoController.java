@@ -60,6 +60,12 @@ public class ManutencaoController {
         return ResponseEntity.ok(manutencaoService.buscarResumoPorVeiculo(veiculoId, dataInicio, dataFim, authentication.getName()));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id, Authentication authentication) {
+        manutencaoService.excluir(id, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/veiculo/{veiculoId}")
     public ResponseEntity<Page<ManutencaoResponse>> buscarPorVeiculo(@PathVariable Long veiculoId, Pageable pageable,
                                                                      Authentication authentication) {

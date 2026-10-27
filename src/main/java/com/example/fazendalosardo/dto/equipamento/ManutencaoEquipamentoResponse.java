@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.dto.equipamento;
 
+import com.example.fazendalosardo.dto.veiculos.ManutencaoListagemRow;
 import com.example.fazendalosardo.model.ManutencaoEquipamento;
 import com.example.fazendalosardo.model.enums.FormaPagamentoManutencao;
 import com.example.fazendalosardo.model.enums.TipoManutencao;
@@ -20,7 +21,10 @@ public record ManutencaoEquipamentoResponse(
         String fornecedorNome,
         String vinculoNome,
         String statusPagamento,
-        LocalDate dataBaixa
+        LocalDate dataBaixa,
+        String origem,
+        Integer numeroParcela,
+        Integer totalParcelas
 ) {
     public static ManutencaoEquipamentoResponse de(ManutencaoEquipamento m) {
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
@@ -29,6 +33,15 @@ public record ManutencaoEquipamentoResponse(
         return new ManutencaoEquipamentoResponse(m.getId(), m.getEquipamento().getId(), m.getEquipamento().getNome(),
                 m.getTipo(), m.getDescricao(), m.getData(), m.getValor(), m.getObservacao(),
                 m.getFormaPagamento(), fornecedorNome, vinculo,
-                m.getStatusPagamento().name(), m.getDataBaixa());
+                m.getStatusPagamento().name(), m.getDataBaixa(), "SIMPLES", null, null);
+    }
+
+    public static ManutencaoEquipamentoResponse deListagem(ManutencaoListagemRow row) {
+        return new ManutencaoEquipamentoResponse(
+                row.id(), null, row.ativoNome(), TipoManutencao.valueOf(row.tipo()), row.descricao(),
+                row.data(), row.valor(), null,
+                FormaPagamentoManutencao.valueOf(row.formaPagamento()), row.fornecedorNome(), row.vinculoNome(),
+                row.statusPagamento(), row.dataBaixa(), row.origem(), row.numeroParcela(), row.totalParcelas()
+        );
     }
 }

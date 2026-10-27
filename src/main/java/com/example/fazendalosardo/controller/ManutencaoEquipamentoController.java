@@ -67,4 +67,10 @@ public class ManutencaoEquipamentoController {
             Authentication authentication) {
         return ResponseEntity.ok(manutencaoEquipamentoService.darBaixa(id, dataBaixa, authentication.getName()));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id, Authentication authentication) {
+        manutencaoEquipamentoService.excluir(id, authentication.getName());
+        return ResponseEntity.noContent().build();
+    }
 }

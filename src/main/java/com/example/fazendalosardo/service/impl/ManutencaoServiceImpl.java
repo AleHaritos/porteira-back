@@ -10,10 +10,12 @@ import com.example.fazendalosardo.model.enums.FormaPagamentoManutencao;
 import com.example.fazendalosardo.model.enums.StatusParcela;
 import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.equipamento.FornecedorRepository;
+import com.example.fazendalosardo.repository.veiculos.ManutencaoListagemRepository;
 import com.example.fazendalosardo.repository.veiculos.ManutencaoRepository;
 import com.example.fazendalosardo.repository.veiculos.VeiculoRepository;
 import com.example.fazendalosardo.service.FornecedorService;
 import com.example.fazendalosardo.service.ManutencaoService;
+import com.example.fazendalosardo.service.TransacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,8 @@ public class ManutencaoServiceImpl implements ManutencaoService {
     private final FazendaAcessoHelper fazendaAcessoHelper;
     private final VeiculoTransacaoHelper helper;
     private final FornecedorService fornecedorService;
+    private final TransacaoService transacaoService;
+    private final ManutencaoListagemRepository manutencaoListagemRepository;
 
     @Override
     public ManutencaoResponse salvar(ManutencaoRequest request, String numeroUsuarioLogado) {
@@ -118,7 +122,8 @@ public class ManutencaoServiceImpl implements ManutencaoService {
     public Page<ManutencaoResponse> buscarPorFazenda(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
                                                      Pageable pageable, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
-        return manutencaoRepository.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, pageable).map(ManutencaoResponse::de);
+        return manutencaoListagemRepository.buscarPorFazendaVeiculo(fazendaId, veiculoId, dataInicio, dataFim, pageable)
+                .map(ManutencaoResponse::deListagem);
     }
 
     @Override
@@ -158,5 +163,21 @@ public class ManutencaoServiceImpl implements ManutencaoService {
         fornecedorService.baixarDivida(manutencao.getFornecedor().getId(), manutencao.getValor(), numeroUsuarioLogado);
 
         return ManutencaoResponse.de(manutencaoRepository.save(manutencao));
+    }
+
+    @Override
+    public void excluir(Long manutencaoId, String numeroUsuarioLogado) {
+        Manutencao manutencao = manutencaoRepository.findById(manutencaoId)
+                .orElseThrow(() -> new NotFoundException("Manutenção não encontrada"));
+        fazendaAcessoHelper.validarAcesso(manutencao.getFazenda(), numeroUsuarioLogado);
+
+        if (manutencao.getTransacao() != null) {
+            transacaoService.desativar(manutencao.getTransacao().getId(), numeroUsuarioLogado);
+        } else if (manutencao.getStatusPagamento() == StatusParcela.PENDENTE && manutencao.getFornecedor() != null) {
+            fornecedorService.baixarDivida(manutencao.getFornecedor().getId(), manutencao.getValor(), numeroUsuarioLogado);
+        }
+
+        manutencao.setAtivo(false);
+        manutencaoRepository.save(manutencao);
     }
 }

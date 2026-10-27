@@ -17,4 +17,6 @@ public interface ManutencaoEquipamentoService {
     Page<ManutencaoEquipamentoResponse> buscarPorFazenda(Long fazendaId, Long equipamentoId, LocalDate dataInicio, LocalDate dataFim,
                                                          Pageable pageable, String numeroUsuarioLogado);
     List<ManutencaoEquipamentoResponse> listarPorFornecedorEStatus(Long fornecedorId, StatusParcela status, String numeroUsuarioLogado);
+
+    void excluir(Long manutencaoId, String numeroUsuarioLogado);
 }
