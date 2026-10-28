@@ -12,7 +12,7 @@ public record FornecedorResponse(
         String observacao,
         Boolean ativo
 ) {
-    public static FornecedorResponse de(Fornecedor f) {
-        return new FornecedorResponse(f.getId(), f.getNome(), f.getEspecialidade(), f.getSaldoDevedor(), f.getObservacao(), f.getAtivo());
+    public static FornecedorResponse de(Fornecedor f, BigDecimal saldoDevedor) {
+        return new FornecedorResponse(f.getId(), f.getNome(), f.getEspecialidade(), saldoDevedor, f.getObservacao(), f.getAtivo());
     }
 }

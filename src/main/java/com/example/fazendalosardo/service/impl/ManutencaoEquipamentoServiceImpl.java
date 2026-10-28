@@ -12,7 +12,6 @@ import com.example.fazendalosardo.repository.equipamento.EquipamentoRepository;
 import com.example.fazendalosardo.repository.equipamento.FornecedorRepository;
 import com.example.fazendalosardo.repository.equipamento.ManutencaoEquipamentoRepository;
 import com.example.fazendalosardo.repository.veiculos.ManutencaoListagemRepository;
-import com.example.fazendalosardo.service.FornecedorService;
 import com.example.fazendalosardo.service.ManutencaoEquipamentoService;
 import com.example.fazendalosardo.service.TransacaoService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
     private final FornecedorRepository fornecedorRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
     private final VeiculoTransacaoHelper helper;
-    private final FornecedorService fornecedorService;
     private final TransacaoService transacaoService;
     private final ManutencaoListagemRepository manutencaoListagemRepository;
 
@@ -72,7 +70,8 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
             if (request.fornecedorId() == null) {
                 throw new BusinessException("Informe o fornecedor para manutenção no fiado");
             }
-            Fornecedor fornecedor = fornecedorService.acumularDivida(request.fornecedorId(), request.valor(), numeroUsuarioLogado);
+            Fornecedor fornecedor = fornecedorRepository.findById(request.fornecedorId())
+                    .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
             manutencao.setFornecedor(fornecedor);
             manutencao.setStatusPagamento(StatusParcela.PENDENTE);
         }
@@ -139,8 +138,6 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
         manutencao.setStatusPagamento(StatusParcela.BAIXADO);
         manutencao.setDataBaixa(dataEfetiva);
 
-        fornecedorService.baixarDivida(manutencao.getFornecedor().getId(), manutencao.getValor(), numeroUsuarioLogado);
-
         return ManutencaoEquipamentoResponse.de(manutencaoEquipamentoRepository.save(manutencao));
     }
 
@@ -152,8 +149,6 @@ public class ManutencaoEquipamentoServiceImpl implements ManutencaoEquipamentoSe
 
         if (manutencao.getTransacao() != null) {
             transacaoService.desativar(manutencao.getTransacao().getId(), numeroUsuarioLogado);
-        } else if (manutencao.getStatusPagamento() == StatusParcela.PENDENTE && manutencao.getFornecedor() != null) {
-            fornecedorService.baixarDivida(manutencao.getFornecedor().getId(), manutencao.getValor(), numeroUsuarioLogado);
         }
 
         manutencao.setAtivo(false);

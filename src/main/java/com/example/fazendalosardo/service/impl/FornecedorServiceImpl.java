@@ -1,14 +1,11 @@
 package com.example.fazendalosardo.service.impl;
 
-import com.example.fazendalosardo.dto.equipamento.FornecedorPagamentoRequest;
 import com.example.fazendalosardo.dto.equipamento.FornecedorRequest;
 import com.example.fazendalosardo.dto.equipamento.FornecedorResponse;
-import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.Fazenda;
 import com.example.fazendalosardo.model.Fornecedor;
-import com.example.fazendalosardo.model.Negocio;
-import com.example.fazendalosardo.model.safras.Safra;
+import com.example.fazendalosardo.repository.equipamento.FornecedorDebitoRepository;
 import com.example.fazendalosardo.repository.equipamento.FornecedorRepository;
 import com.example.fazendalosardo.service.FornecedorService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +21,8 @@ import java.util.List;
 public class FornecedorServiceImpl implements FornecedorService {
 
     private final FornecedorRepository fornecedorRepository;
+    private final FornecedorDebitoRepository fornecedorDebitoRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
-    private final VeiculoTransacaoHelper helper;
 
     @Override
     public FornecedorResponse salvar(FornecedorRequest request, String numeroUsuarioLogado) {
@@ -35,9 +32,8 @@ public class FornecedorServiceImpl implements FornecedorService {
         fornecedor.setEspecialidade(request.especialidade());
         fornecedor.setObservacao(request.observacao());
         fornecedor.setFazenda(fazenda);
-        fornecedor.setSaldoDevedor(BigDecimal.ZERO);
         fornecedor.setAtivo(true);
-        return FornecedorResponse.de(fornecedorRepository.save(fornecedor));
+        return FornecedorResponse.de(fornecedorRepository.save(fornecedor), BigDecimal.ZERO);
     }
 
     @Override
@@ -45,59 +41,21 @@ public class FornecedorServiceImpl implements FornecedorService {
         Fornecedor fornecedor = fornecedorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
         fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
-        return FornecedorResponse.de(fornecedor);
-    }
-
-    @Override
-    public Fornecedor baixarDivida(Long fornecedorId, BigDecimal valor, String numeroUsuarioLogado) {
-        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
-                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
-        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
-        fornecedor.setSaldoDevedor(fornecedor.getSaldoDevedor().subtract(valor));
-        return fornecedorRepository.save(fornecedor);
+        return FornecedorResponse.de(fornecedor, fornecedorDebitoRepository.somarPendentePorFornecedor(fornecedor.getId()));
     }
 
     @Override
     public Page<FornecedorResponse> listarPorFazenda(Long fazendaId, Pageable pageable, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
         return fornecedorRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId, pageable)
-                .map(FornecedorResponse::de);
+                .map(fornecedor -> FornecedorResponse.de(fornecedor, fornecedorDebitoRepository.somarPendentePorFornecedor(fornecedor.getId())));
     }
 
     @Override
     public List<FornecedorResponse> listarTodosPorFazenda(Long fazendaId, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
-        return fornecedorRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId)
-                .stream().map(FornecedorResponse::de).toList();
-    }
-
-    @Override
-    public Fornecedor acumularDivida(Long fornecedorId, BigDecimal valor, String numeroUsuarioLogado) {
-        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
-                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
-        fazendaAcessoHelper.validarAcesso(fornecedor.getFazenda(), numeroUsuarioLogado);
-        fornecedor.setSaldoDevedor(fornecedor.getSaldoDevedor().add(valor));
-        return fornecedorRepository.save(fornecedor);
-    }
-
-    @Override
-    public FornecedorResponse registrarPagamento(Long fornecedorId, FornecedorPagamentoRequest request, String numeroUsuarioLogado) {
-        Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
-                .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
-        Fazenda fazenda = fornecedor.getFazenda();
-        fazendaAcessoHelper.validarAcesso(fazenda, numeroUsuarioLogado);
-        helper.validarVinculoXor(request.negocioId(), request.safraId());
-
-        if (request.valor().compareTo(fornecedor.getSaldoDevedor()) > 0) {
-            throw new BusinessException("O valor do pagamento não pode ser maior que o saldo devedor do fornecedor");
-        }
-
-        Negocio negocio = helper.buscarNegocio(request.negocioId());
-        Safra safra = helper.buscarSafra(request.safraId());
-        String descricao = "Pagamento fornecedor - %s".formatted(fornecedor.getNome());
-        helper.gerarTransacaoGasto(fazenda, negocio, safra, request.valor(), request.data(), descricao);
-
-        fornecedor.setSaldoDevedor(fornecedor.getSaldoDevedor().subtract(request.valor()));
-        return FornecedorResponse.de(fornecedorRepository.save(fornecedor));
+        return fornecedorRepository.findByFazendaIdAndAtivoTrueOrderByNome(fazendaId).stream()
+                .map(fornecedor -> FornecedorResponse.de(fornecedor, fornecedorDebitoRepository.somarPendentePorFornecedor(fornecedor.getId())))
+                .toList();
     }
 }

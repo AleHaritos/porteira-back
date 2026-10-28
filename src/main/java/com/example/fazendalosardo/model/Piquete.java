@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.model;
 
+import com.example.fazendalosardo.model.enums.StatusPiquete;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,10 @@ public class Piquete {
     @Column(name = "area_hectares", nullable = false, precision = 10, scale = 2)
     private BigDecimal areaHectares;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private StatusPiquete status;
+
     @Column(nullable = false)
     private Boolean ativo;
 
@@ -39,6 +44,9 @@ public class Piquete {
     public void prePersist() {
         if (ativo == null) {
             ativo = true;
+        }
+        if (status == null) {
+            status = StatusPiquete.CRIA;
         }
     }
 }

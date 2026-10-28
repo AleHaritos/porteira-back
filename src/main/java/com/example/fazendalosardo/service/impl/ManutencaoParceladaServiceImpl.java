@@ -13,7 +13,6 @@ import com.example.fazendalosardo.repository.equipamento.FornecedorRepository;
 import com.example.fazendalosardo.repository.veiculos.ManutencaoParceladaRepository;
 import com.example.fazendalosardo.repository.veiculos.ParcelaManutencaoRepository;
 import com.example.fazendalosardo.repository.veiculos.VeiculoRepository;
-import com.example.fazendalosardo.service.FornecedorService;
 import com.example.fazendalosardo.service.ManutencaoParceladaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,6 @@ public class ManutencaoParceladaServiceImpl implements ManutencaoParceladaServic
     private final FornecedorRepository fornecedorRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
     private final VeiculoTransacaoHelper helper;
-    private final FornecedorService fornecedorService;
 
     @Override
     public ManutencaoParceladaResponse salvar(ManutencaoParceladaRequest request, String numeroUsuarioLogado) {
@@ -88,8 +86,6 @@ public class ManutencaoParceladaServiceImpl implements ManutencaoParceladaServic
         manutencao.setAtivo(true);
         manutencao.setParcelas(gerarParcelas(manutencao, request.valoresParcelas(), request.primeiraDataVencimento()));
 
-        fornecedorService.acumularDivida(fornecedor.getId(), valorTotal, numeroUsuarioLogado);
-
         return ManutencaoParceladaResponse.de(manutencaoParceladaRepository.save(manutencao));
     }
 
@@ -139,8 +135,6 @@ public class ManutencaoParceladaServiceImpl implements ManutencaoParceladaServic
         parcela.setTransacao(transacao);
         parcela.setStatus(StatusParcela.BAIXADO);
         parcela.setDataBaixa(dataEfetiva);
-
-        fornecedorService.baixarDivida(manutencao.getFornecedor().getId(), parcela.getValor(), numeroUsuarioLogado);
 
         return ParcelaManutencaoResponse.de(parcelaManutencaoRepository.save(parcela));
     }

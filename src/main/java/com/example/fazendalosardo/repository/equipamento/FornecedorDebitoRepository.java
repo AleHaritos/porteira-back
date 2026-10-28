@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -59,6 +60,31 @@ public class FornecedorDebitoRepository {
           AND p.data_vencimento >= ? AND p.data_vencimento <= ?
         """;
 
+    private static final String UNION_SQL_SOMA = """
+        SELECT m.valor AS valor
+        FROM manutencoes m
+        WHERE m.fornecedor_id = ? AND m.status_pagamento = 'PENDENTE' AND m.ativo = true
+
+        UNION ALL
+
+        SELECT me.valor AS valor
+        FROM manutencoes_equipamento me
+        WHERE me.fornecedor_id = ? AND me.status_pagamento = 'PENDENTE' AND me.ativo = true
+
+        UNION ALL
+
+        SELECT cf.valor AS valor
+        FROM contas_fornecedor cf
+        WHERE cf.fornecedor_id = ? AND cf.status_pagamento = 'PENDENTE'
+
+        UNION ALL
+
+        SELECT p.valor AS valor
+        FROM parcelas_manutencao p
+        JOIN manutencoes_parceladas mp ON mp.id = p.manutencao_parcelada_id
+        WHERE mp.fornecedor_id = ? AND p.status = 'PENDENTE' AND mp.ativo = true
+        """;
+
     public Page<FornecedorDebitoRow> buscarPorFornecedorEStatus(Long fornecedorId, String status, LocalDate dataInicio, LocalDate dataFim, Pageable pageable) {
         String sqlPaginado = UNION_SQL + " ORDER BY data DESC LIMIT ? OFFSET ?";
 
@@ -92,5 +118,12 @@ public class FornecedorDebitoRepository {
         );
 
         return new PageImpl<>(conteudo, pageable, total != null ? total : 0);
+    }
+
+    public BigDecimal somarPendentePorFornecedor(Long fornecedorId) {
+        String sql = "SELECT COALESCE(SUM(valor), 0) FROM (" + UNION_SQL_SOMA + ") AS total";
+        BigDecimal resultado = jdbcTemplate.queryForObject(sql, BigDecimal.class,
+                fornecedorId, fornecedorId, fornecedorId, fornecedorId);
+        return resultado != null ? resultado : BigDecimal.ZERO;
     }
 }

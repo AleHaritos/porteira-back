@@ -10,7 +10,6 @@ import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.equipamento.ContaFornecedorRepository;
 import com.example.fazendalosardo.repository.equipamento.FornecedorRepository;
 import com.example.fazendalosardo.service.ContaFornecedorService;
-import com.example.fazendalosardo.service.FornecedorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,6 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
     private final FornecedorRepository fornecedorRepository;
     private final FazendaAcessoHelper fazendaAcessoHelper;
     private final VeiculoTransacaoHelper helper;
-    private final FornecedorService fornecedorService;
 
     @Override
     public ContaFornecedorResponse salvar(ContaFornecedorRequest request, String numeroUsuarioLogado) {
@@ -47,8 +45,6 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
         conta.setNegocio(negocio);
         conta.setSafra(safra);
         conta.setStatusPagamento(StatusParcela.PENDENTE);
-
-        fornecedorService.acumularDivida(fornecedor.getId(), request.valor(), numeroUsuarioLogado);
 
         return ContaFornecedorResponse.de(contaFornecedorRepository.save(conta));
     }
@@ -81,8 +77,6 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
         conta.setTransacao(transacao);
         conta.setStatusPagamento(StatusParcela.BAIXADO);
         conta.setDataBaixa(dataEfetiva);
-
-        fornecedorService.baixarDivida(conta.getFornecedor().getId(), conta.getValor(), numeroUsuarioLogado);
 
         return ContaFornecedorResponse.de(contaFornecedorRepository.save(conta));
     }

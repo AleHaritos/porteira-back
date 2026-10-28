@@ -1,6 +1,5 @@
 package com.example.fazendalosardo.controller;
 
-import com.example.fazendalosardo.dto.equipamento.FornecedorPagamentoRequest;
 import com.example.fazendalosardo.dto.equipamento.FornecedorRequest;
 import com.example.fazendalosardo.dto.equipamento.FornecedorResponse;
 import com.example.fazendalosardo.service.FornecedorService;
@@ -45,11 +44,5 @@ public class FornecedorController {
     @GetMapping("/{id}")
     public ResponseEntity<FornecedorResponse> buscarPorId(@PathVariable Long id, Authentication authentication) {
         return ResponseEntity.ok(fornecedorService.buscarPorId(id, authentication.getName()));
-    }
-
-    @PostMapping("/{id}/pagamento")
-    public ResponseEntity<FornecedorResponse> registrarPagamento(@PathVariable Long id, @Valid @RequestBody FornecedorPagamentoRequest request,
-                                                                 Authentication authentication) {
-        return ResponseEntity.ok(fornecedorService.registrarPagamento(id, request, authentication.getName()));
     }
 }

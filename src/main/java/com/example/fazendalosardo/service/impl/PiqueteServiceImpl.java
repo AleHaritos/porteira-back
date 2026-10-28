@@ -30,6 +30,7 @@ public class PiqueteServiceImpl implements PiqueteService {
         Piquete piquete = new Piquete();
         piquete.setNome(request.nome());
         piquete.setAreaHectares(request.areaHectares());
+        piquete.setStatus(request.status());
         piquete.setFazenda(fazenda);
         piquete.setAtivo(true);
 
@@ -46,6 +47,7 @@ public class PiqueteServiceImpl implements PiqueteService {
 
         piquete.setNome(request.nome());
         piquete.setAreaHectares(request.areaHectares());
+        piquete.setStatus(request.status());
 
         return toResponse(piquete);
     }
@@ -72,6 +74,7 @@ public class PiqueteServiceImpl implements PiqueteService {
                 piquete.getId(),
                 piquete.getNome(),
                 piquete.getAreaHectares(),
+                piquete.getStatus(),
                 piquete.getAtivo(),
                 quantidadeAnimais
         );
