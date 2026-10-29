@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.dto.safraDTO;
 
+import com.example.fazendalosardo.model.enums.TipoManejo;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ public record TalhaoUpdateRequest(
         @NotBlank String nome,
         @NotNull @DecimalMin(value = "0.0", inclusive = false) BigDecimal areaHectares,
         String localizacao,
-        String observacao
+        String observacao,
+        @NotNull TipoManejo statusTalhao
 ) {
 }

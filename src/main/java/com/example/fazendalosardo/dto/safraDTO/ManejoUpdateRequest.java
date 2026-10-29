@@ -9,6 +9,7 @@ import java.util.List;
 
 public record ManejoUpdateRequest(
         @NotNull TipoManejo tipo,
+        String titulo,
         @NotNull LocalDate data,
         String descricao,
         String observacoes,

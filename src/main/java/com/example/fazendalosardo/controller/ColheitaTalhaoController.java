@@ -2,6 +2,7 @@ package com.example.fazendalosardo.controller;
 
 import com.example.fazendalosardo.dto.safraDTO.ColheitaTalhaoRequest;
 import com.example.fazendalosardo.dto.safraDTO.ColheitaTalhaoResponse;
+import com.example.fazendalosardo.dto.safraDTO.ColheitaTalhaoUpdateRequest;
 import com.example.fazendalosardo.service.ColheitaTalhaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,11 @@ public class ColheitaTalhaoController {
     @ResponseStatus(HttpStatus.CREATED)
     public ColheitaTalhaoResponse salvar(@RequestBody @Valid ColheitaTalhaoRequest request) {
         return colheitaTalhaoService.salvar(request);
+    }
+
+    @PutMapping("/{id}")
+    public ColheitaTalhaoResponse atualizar(@PathVariable Long id, @RequestBody @Valid ColheitaTalhaoUpdateRequest request) {
+        return colheitaTalhaoService.atualizar(id, request);
     }
 
     @GetMapping("/talhao/{talhaoId}")

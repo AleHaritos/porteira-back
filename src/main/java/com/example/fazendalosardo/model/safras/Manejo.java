@@ -28,6 +28,9 @@ public class Manejo {
     @Column(name = "tipo", nullable = false, length = 20)
     private TipoManejo tipo;
 
+    @Column(name = "titulo", length = 150)
+    private String titulo;
+
     @NotNull
     @Column(name = "data", nullable = false)
     private LocalDate data;

@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.dto.safraDTO;
 
+import com.example.fazendalosardo.model.enums.TipoManejo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -11,6 +12,7 @@ public record TalhaoRequest(
         @NotNull @Positive BigDecimal areaHectares,
         String localizacao,
         String observacao,
+        @NotNull TipoManejo statusTalhao,
         @NotNull Long safraId
 ) {
 }

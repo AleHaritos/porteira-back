@@ -9,6 +9,7 @@ import java.util.List;
 public record ManejoResponse(
         Long id,
         TipoManejo tipo,
+        String titulo,
         LocalDate data,
         String descricao,
         String observacoes,

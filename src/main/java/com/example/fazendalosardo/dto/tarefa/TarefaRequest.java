@@ -13,6 +13,9 @@ public record TarefaRequest(
         String descricao,
         @NotNull PrioridadeTarefa prioridade,
         LocalDate prazo,
-        List<String> subtarefas
+        List<String> subtarefas,
+        Long negocioId,
+        Long safraId,
+        Long projetoId
 ) {
 }

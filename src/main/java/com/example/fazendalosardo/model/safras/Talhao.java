@@ -1,5 +1,6 @@
 package com.example.fazendalosardo.model.safras;
 
+import com.example.fazendalosardo.model.enums.TipoManejo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +36,11 @@ public class Talhao {
 
     @Column(name = "observacao", length = 500)
     private String observacao;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_talhao", length = 30, nullable = false)
+    private TipoManejo statusTalhao = TipoManejo.PREPARO_DO_SOLO;
 
     @Column(nullable = false)
     private Boolean ativo = true;

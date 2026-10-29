@@ -2,6 +2,7 @@ package com.example.fazendalosardo.model;
 
 import com.example.fazendalosardo.model.enums.PrioridadeTarefa;
 import com.example.fazendalosardo.model.enums.StatusTarefa;
+import com.example.fazendalosardo.model.safras.Safra;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -50,6 +51,18 @@ public class Tarefa {
 
     @Column(name = "ordem", nullable = false)
     private Integer ordem = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "negocio_id")
+    private Negocio negocio;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "safra_id")
+    private Safra safra;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projeto_id")
+    private Projeto projeto;
 
     @OneToMany(mappedBy = "tarefa", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("ordem ASC")

@@ -2,6 +2,7 @@ package com.example.fazendalosardo.service.impl;
 
 import com.example.fazendalosardo.dto.safraDTO.ColheitaTalhaoRequest;
 import com.example.fazendalosardo.dto.safraDTO.ColheitaTalhaoResponse;
+import com.example.fazendalosardo.dto.safraDTO.ColheitaTalhaoUpdateRequest;
 import com.example.fazendalosardo.exception.NotFoundException;
 import com.example.fazendalosardo.model.safras.ColheitaTalhao;
 import com.example.fazendalosardo.model.safras.Talhao;
@@ -30,6 +31,21 @@ public class ColheitaTalhaoServiceImpl implements ColheitaTalhaoService {
         ColheitaTalhao colheita = new ColheitaTalhao();
         colheita.setTalhao(talhao);
         colheita.setDescricao(request.descricao());
+        colheita.setData(request.data());
+        colheita.setQuantidadeColhida(request.quantidadeColhida());
+        colheita.setValorUnitario(request.valorUnitario());
+
+        return ColheitaTalhaoResponse.de(colheitaTalhaoRepository.save(colheita));
+    }
+
+    @Override
+    @Transactional
+    public ColheitaTalhaoResponse atualizar(Long id, ColheitaTalhaoUpdateRequest request) {
+        ColheitaTalhao colheita = colheitaTalhaoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Colheita não encontrada"));
+
+        colheita.setDescricao(request.descricao());
+        colheita.setData(request.data());
         colheita.setQuantidadeColhida(request.quantidadeColhida());
         colheita.setValorUnitario(request.valorUnitario());
 
