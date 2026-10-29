@@ -49,6 +49,7 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
               AND (CAST(:dataFim AS date) IS NULL OR a.data <= :dataFim)
               AND (:negocioId IS NULL OR a.negocio.id = :negocioId)
               AND (:safraId IS NULL OR a.safra.id = :safraId)
+              AND (:projetoId IS NULL OR a.projeto.id = :projetoId)
             ORDER BY a.data DESC
             """)
     Page<Abastecimento> buscarPorFazenda(@Param("fazendaId") Long fazendaId,
@@ -57,6 +58,7 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
                                          @Param("dataFim") LocalDate dataFim,
                                          @Param("negocioId") Long negocioId,
                                          @Param("safraId") Long safraId,
+                                         @Param("projetoId") Long projetoId,
                                          Pageable pageable);
 
     @Query("""
@@ -70,13 +72,15 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
               AND (CAST(:dataFim AS date) IS NULL OR a.data <= :dataFim)
               AND (:negocioId IS NULL OR a.negocio.id = :negocioId)
               AND (:safraId IS NULL OR a.safra.id = :safraId)
+              AND (:projetoId IS NULL OR a.projeto.id = :projetoId)
             """)
     AbastecimentoResumoResponse buscarResumo(@Param("fazendaId") Long fazendaId,
                                              @Param("veiculoId") Long veiculoId,
                                              @Param("dataInicio") LocalDate dataInicio,
                                              @Param("dataFim") LocalDate dataFim,
                                              @Param("negocioId") Long negocioId,
-                                             @Param("safraId") Long safraId);
+                                             @Param("safraId") Long safraId,
+                                             @Param("projetoId") Long projetoId);
 
     @Query("SELECT COALESCE(SUM(a.valorTotal), 0) FROM Abastecimento a WHERE a.safra.id = :safraId AND a.ativo = true")
     BigDecimal somarValorPorSafra(@Param("safraId") Long safraId);

@@ -43,9 +43,10 @@ public class ManutencaoServiceImpl implements ManutencaoService {
                 .orElseThrow(() -> new NotFoundException("Veículo não encontrado"));
 
 
-        helper.validarVinculoXor(request.negocioId(), request.safraId());
+        helper.validarVinculoXor(request.negocioId(), request.safraId(), request.projetoId());
         Negocio negocio = helper.buscarNegocio(request.negocioId());
         Safra safra = helper.buscarSafra(request.safraId());
+        Projeto projeto = helper.buscarProjeto(request.projetoId());
 
         String base = (request.descricao() != null && !request.descricao().isBlank())
                 ? request.descricao() : "Manutenção";
@@ -62,11 +63,12 @@ public class ManutencaoServiceImpl implements ManutencaoService {
         manutencao.setFazenda(fazenda);
         manutencao.setNegocio(negocio);
         manutencao.setSafra(safra);
+        manutencao.setProjeto(projeto);
         manutencao.setFormaPagamento(request.formaPagamento());
         manutencao.setAtivo(true);
 
         if (request.formaPagamento() == FormaPagamentoManutencao.A_VISTA) {
-            Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, request.valor(), request.data(), descricao);
+            Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, projeto, request.valor(), request.data(), descricao);
             manutencao.setTransacao(transacao);
             manutencao.setStatusPagamento(StatusParcela.BAIXADO);
         } else {
@@ -153,7 +155,8 @@ public class ManutencaoServiceImpl implements ManutencaoService {
         String descricao = "%s - %s".formatted(descricaoBase, manutencao.getVeiculo().getNome());
 
         Transacao transacao = helper.gerarTransacaoGasto(
-                manutencao.getFazenda(), manutencao.getNegocio(), manutencao.getSafra(), manutencao.getValor(), dataEfetiva, descricao);
+                manutencao.getFazenda(), manutencao.getNegocio(), manutencao.getSafra(), manutencao.getProjeto(),
+                manutencao.getValor(), dataEfetiva, descricao);
 
         manutencao.setTransacao(transacao);
         manutencao.setStatusPagamento(StatusParcela.BAIXADO);

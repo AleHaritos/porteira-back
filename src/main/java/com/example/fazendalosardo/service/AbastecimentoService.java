@@ -18,10 +18,10 @@ public interface AbastecimentoService {
                                                LocalDate dataFim, Pageable pageable, String numeroUsuarioLogado);
 
     Page<AbastecimentoResponse> buscarPorFazenda(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
-                                                 Long negocioId, Long safraId, Pageable pageable, String numeroUsuarioLogado);
+                                                 Long negocioId, Long safraId, Long projetoId, Pageable pageable, String numeroUsuarioLogado);
 
     AbastecimentoResumoResponse buscarResumo(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
-                                             Long negocioId, Long safraId, String numeroUsuarioLogado);
+                                             Long negocioId, Long safraId, Long projetoId, String numeroUsuarioLogado);
 
     AbastecimentoResponse darBaixa(Long abastecimentoId, LocalDate dataBaixa, String numeroUsuarioLogado);
 }

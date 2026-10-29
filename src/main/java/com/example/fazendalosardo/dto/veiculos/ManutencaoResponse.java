@@ -28,7 +28,8 @@ public record ManutencaoResponse(
 ) {
     public static ManutencaoResponse de(Manutencao m) {
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
-                : m.getSafra() != null ? m.getSafra().getNome() : null;
+                : m.getSafra() != null ? m.getSafra().getNome()
+                : m.getProjeto() != null ? m.getProjeto().getNome() : null;
         String fornecedorNome = m.getFornecedor() != null ? m.getFornecedor().getNome() : null;
         return new ManutencaoResponse(m.getId(), m.getVeiculo().getId(), m.getVeiculo().getNome(),
                 m.getTipo(), m.getDescricao(), m.getData(), m.getValor(), m.getKmAtual(), m.getObservacao(),

@@ -18,7 +18,8 @@ public record ContaFornecedorResponse(
 ) {
     public static ContaFornecedorResponse de(ContaFornecedor c) {
         String vinculo = c.getNegocio() != null ? c.getNegocio().getNome()
-                : c.getSafra() != null ? c.getSafra().getNome() : null;
+                : c.getSafra() != null ? c.getSafra().getNome()
+                : c.getProjeto() != null ? c.getProjeto().getNome() : null;
         return new ContaFornecedorResponse(c.getId(), c.getFornecedor().getId(), c.getFornecedor().getNome(),
                 c.getDescricao(), c.getData(), c.getValor(), vinculo,
                 c.getStatusPagamento().name(), c.getDataBaixa());

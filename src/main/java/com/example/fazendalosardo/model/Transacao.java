@@ -51,4 +51,8 @@ public class Transacao {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "safra_id")
     private Safra safra;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projeto_id")
+    private Projeto projeto;
 }

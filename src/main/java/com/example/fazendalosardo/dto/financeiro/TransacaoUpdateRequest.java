@@ -13,6 +13,7 @@ public record TransacaoUpdateRequest(
         String descricao,
         String observacao,
         Long negocioId,
-        Long safraId
+        Long safraId,
+        Long projetoId
 ) {
 }

@@ -18,6 +18,8 @@ public record TransacaoResponse(
         Long negocioId,
         String negocioNome,
         Long safraId,
-        String safraNome
+        String safraNome,
+        Long projetoId,
+        String projetoNome
 ) {
 }

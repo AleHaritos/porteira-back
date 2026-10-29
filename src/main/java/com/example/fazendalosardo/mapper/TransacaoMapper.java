@@ -16,6 +16,7 @@ public interface TransacaoMapper {
     @Mapping(target = "fazenda", ignore = true)
     @Mapping(target = "negocio", ignore = true)
     @Mapping(target = "safra", ignore = true)
+    @Mapping(target = "projeto", ignore = true)
     Transacao toEntity(TransacaoRequest request);
 
     @Mapping(target = "fazendaId", source = "fazenda.id")
@@ -24,6 +25,8 @@ public interface TransacaoMapper {
     @Mapping(target = "negocioNome", source = "negocio.nome")
     @Mapping(target = "safraId", source = "safra.id")
     @Mapping(target = "safraNome", source = "safra.nome")
+    @Mapping(target = "projetoId", source = "projeto.id")
+    @Mapping(target = "projetoNome", source = "projeto.nome")
     TransacaoResponse toResponse(Transacao transacao);
 
     @Mapping(target = "id", ignore = true)
@@ -31,5 +34,6 @@ public interface TransacaoMapper {
     @Mapping(target = "fazenda", ignore = true)
     @Mapping(target = "negocio", ignore = true)
     @Mapping(target = "safra", ignore = true)
+    @Mapping(target = "projeto", ignore = true)
     void atualizar(TransacaoUpdateRequest request, @MappingTarget Transacao transacao);
 }

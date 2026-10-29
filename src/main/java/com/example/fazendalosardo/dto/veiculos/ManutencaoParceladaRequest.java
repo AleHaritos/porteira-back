@@ -18,6 +18,7 @@ public record ManutencaoParceladaRequest(
         @NotNull Long fornecedorId,
         Long negocioId,
         Long safraId,
+        Long projetoId,
         @NotNull LocalDate primeiraDataVencimento,
         @NotEmpty List<@Positive BigDecimal> valoresParcelas
 ) {

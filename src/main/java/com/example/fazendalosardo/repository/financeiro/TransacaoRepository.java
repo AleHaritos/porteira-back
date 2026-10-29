@@ -22,6 +22,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
               AND t.tipo = COALESCE(:tipo, t.tipo)
               AND (:negocioId IS NULL OR t.negocio.id = :negocioId)
               AND (:safraId IS NULL OR t.safra.id = :safraId)
+              AND (:projetoId IS NULL OR t.projeto.id = :projetoId)
             ORDER BY t.data DESC
             """)
     Page<Transacao> buscarComFiltros(@Param("fazendaId") Long fazendaId,
@@ -30,6 +31,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
                                      @Param("tipo") TipoTransacao tipo,
                                      @Param("negocioId") Long negocioId,
                                      @Param("safraId") Long safraId,
+                                     @Param("projetoId") Long projetoId,
                                      Pageable pageable);
 
     @Query("""
@@ -44,12 +46,14 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
               AND t.data <= COALESCE(:dataFim, t.data)
               AND (:negocioId IS NULL OR t.negocio.id = :negocioId)
               AND (:safraId IS NULL OR t.safra.id = :safraId)
+              AND (:projetoId IS NULL OR t.projeto.id = :projetoId)
             """)
     ResumoFinanceiroResponse buscarResumo(@Param("fazendaId") Long fazendaId,
                                           @Param("dataInicio") LocalDate dataInicio,
                                           @Param("dataFim") LocalDate dataFim,
                                           @Param("negocioId") Long negocioId,
-                                          @Param("safraId") Long safraId);
+                                          @Param("safraId") Long safraId,
+                                          @Param("projetoId") Long projetoId);
 
     @Query("""
             SELECT new com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse(
@@ -65,7 +69,6 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
     ResumoFinanceiroResponse buscarResumoPorNegocio(@Param("negocioId") Long negocioId,
                                                     @Param("dataInicio") LocalDate dataInicio,
                                                     @Param("dataFim") LocalDate dataFim);
-
 
     @Query("""
             SELECT new com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse(
@@ -83,6 +86,21 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
                                                   @Param("dataFim") LocalDate dataFim);
 
     @Query("""
+            SELECT new com.example.fazendalosardo.dto.financeiro.ResumoFinanceiroResponse(
+                COALESCE(SUM(CASE WHEN t.tipo = 'RECEITA' THEN t.valor ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN t.tipo = 'GASTO' THEN t.valor ELSE 0 END), 0)
+            )
+            FROM Transacao t
+            WHERE t.projeto.id = :projetoId
+              AND t.ativo = true
+              AND t.data >= COALESCE(:dataInicio, t.data)
+              AND t.data <= COALESCE(:dataFim, t.data)
+            """)
+    ResumoFinanceiroResponse buscarResumoPorProjeto(@Param("projetoId") Long projetoId,
+                                                    @Param("dataInicio") LocalDate dataInicio,
+                                                    @Param("dataFim") LocalDate dataFim);
+
+    @Query("""
             SELECT t FROM Transacao t
             WHERE t.fazenda.id = :fazendaId
               AND t.ativo = true
@@ -91,6 +109,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
               AND t.tipo = COALESCE(:tipo, t.tipo)
               AND (:negocioId IS NULL OR t.negocio.id = :negocioId)
               AND (:safraId IS NULL OR t.safra.id = :safraId)
+              AND (:projetoId IS NULL OR t.projeto.id = :projetoId)
             ORDER BY t.data DESC
             """)
     List<Transacao> listarComFiltros(@Param("fazendaId") Long fazendaId,
@@ -98,7 +117,8 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
                                      @Param("dataFim") LocalDate dataFim,
                                      @Param("tipo") TipoTransacao tipo,
                                      @Param("negocioId") Long negocioId,
-                                     @Param("safraId") Long safraId);
+                                     @Param("safraId") Long safraId,
+                                     @Param("projetoId") Long projetoId);
 
     Page<Transacao> findByNegocioIdAndAtivoTrue(Long negocioId, Pageable pageable);
 

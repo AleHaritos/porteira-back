@@ -32,9 +32,10 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
         Fornecedor fornecedor = fornecedorRepository.findById(request.fornecedorId())
                 .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
 
-        helper.validarVinculoXor(request.negocioId(), request.safraId());
+        helper.validarVinculoXor(request.negocioId(), request.safraId(), request.projetoId());
         Negocio negocio = helper.buscarNegocio(request.negocioId());
         Safra safra = helper.buscarSafra(request.safraId());
+        Projeto projeto = helper.buscarProjeto(request.projetoId());
 
         ContaFornecedor conta = new ContaFornecedor();
         conta.setFornecedor(fornecedor);
@@ -44,6 +45,7 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
         conta.setValor(request.valor());
         conta.setNegocio(negocio);
         conta.setSafra(safra);
+        conta.setProjeto(projeto);
         conta.setStatusPagamento(StatusParcela.PENDENTE);
 
         return ContaFornecedorResponse.de(contaFornecedorRepository.save(conta));
@@ -72,7 +74,7 @@ public class ContaFornecedorServiceImpl implements ContaFornecedorService {
         String descricao = "%s - %s".formatted(conta.getDescricao(), conta.getFornecedor().getNome());
 
         Transacao transacao = helper.gerarTransacaoGasto(
-                conta.getFazenda(), conta.getNegocio(), conta.getSafra(), conta.getValor(), dataEfetiva, descricao);
+                conta.getFazenda(), conta.getNegocio(), conta.getSafra(), conta.getProjeto(), conta.getValor(), dataEfetiva, descricao);
 
         conta.setTransacao(transacao);
         conta.setStatusPagamento(StatusParcela.BAIXADO);

@@ -15,7 +15,7 @@ public interface TransacaoService {
     TransacaoResponse salvar(TransacaoRequest request, String numeroUsuarioLogado);
 
     Page<TransacaoResponse> buscarPorFazenda(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                             TipoTransacao tipo, Long negocioId, Long safraId,
+                                             TipoTransacao tipo, Long negocioId, Long safraId, Long projetoId,
                                              Pageable pageable, String numeroUsuarioLogado);
 
     TransacaoResponse atualizar(Long id, TransacaoUpdateRequest request, String numeroUsuarioLogado);
@@ -27,10 +27,12 @@ public interface TransacaoService {
     ResumoFinanceiroResponse buscarResumoPorSafra(Long safraId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
 
     ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                          Long negocioId, Long safraId, String numeroUsuarioLogado);
+                                          Long negocioId, Long safraId, Long projetoId, String numeroUsuarioLogado);
 
     List<TransacaoResponse> listarComFiltros(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                             TipoTransacao tipo, Long negocioId, Long safraId, String numeroUsuarioLogado);
+                                             TipoTransacao tipo, Long negocioId, Long safraId, Long projetoId, String numeroUsuarioLogado);
 
     ResumoFinanceiroResponse buscarResumoPorNegocio(Long negocioId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
+
+    ResumoFinanceiroResponse buscarResumoPorProjeto(Long projetoId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado);
 }

@@ -42,9 +42,10 @@ public class AbastecimentoController {
                                                                         @RequestParam(required = false) LocalDate dataFim,
                                                                         @RequestParam(required = false) Long negocioId,
                                                                         @RequestParam(required = false) Long safraId,
+                                                                        @RequestParam(required = false) Long projetoId,
                                                                         Pageable pageable,
                                                                         Authentication authentication) {
-        return ResponseEntity.ok(abastecimentoService.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, pageable, authentication.getName()));
+        return ResponseEntity.ok(abastecimentoService.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, projetoId, pageable, authentication.getName()));
     }
 
     @GetMapping("/fazenda/{fazendaId}/resumo")
@@ -54,8 +55,9 @@ public class AbastecimentoController {
                                                                     @RequestParam(required = false) LocalDate dataFim,
                                                                     @RequestParam(required = false) Long negocioId,
                                                                     @RequestParam(required = false) Long safraId,
+                                                                    @RequestParam(required = false) Long projetoId,
                                                                     Authentication authentication) {
-        return ResponseEntity.ok(abastecimentoService.buscarResumo(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, authentication.getName()));
+        return ResponseEntity.ok(abastecimentoService.buscarResumo(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, projetoId, authentication.getName()));
     }
 
     @GetMapping("/posto/{postoId}")

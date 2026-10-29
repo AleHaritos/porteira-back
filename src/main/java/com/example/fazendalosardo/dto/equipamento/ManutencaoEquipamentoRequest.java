@@ -18,6 +18,7 @@ public record ManutencaoEquipamentoRequest(
         @NotNull Long fazendaId,
         Long negocioId,
         Long safraId,
+        Long projetoId,
         @NotNull FormaPagamentoManutencao formaPagamento,
         Long fornecedorId
 ) {}

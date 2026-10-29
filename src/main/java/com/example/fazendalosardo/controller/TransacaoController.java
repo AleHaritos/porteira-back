@@ -39,10 +39,11 @@ public class TransacaoController {
             @RequestParam(required = false) TipoTransacao tipo,
             @RequestParam(required = false) Long negocioId,
             @RequestParam(required = false) Long safraId,
+            @RequestParam(required = false) Long projetoId,
             Pageable pageable,
             Authentication authentication) {
         return ResponseEntity.ok(
-                transacaoService.buscarPorFazenda(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, pageable, authentication.getName()));
+                transacaoService.buscarPorFazenda(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, projetoId, pageable, authentication.getName()));
     }
 
     @GetMapping("/fazenda/{fazendaId}/todos")
@@ -53,9 +54,10 @@ public class TransacaoController {
             @RequestParam(required = false) TipoTransacao tipo,
             @RequestParam(required = false) Long negocioId,
             @RequestParam(required = false) Long safraId,
+            @RequestParam(required = false) Long projetoId,
             Authentication authentication) {
         return ResponseEntity.ok(
-                transacaoService.listarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, authentication.getName()));
+                transacaoService.listarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, projetoId, authentication.getName()));
     }
 
     @PutMapping("/{id}")
@@ -88,8 +90,9 @@ public class TransacaoController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
             @RequestParam(required = false) Long negocioId,
             @RequestParam(required = false) Long safraId,
+            @RequestParam(required = false) Long projetoId,
             Authentication authentication) {
-        return ResponseEntity.ok(transacaoService.buscarResumo(fazendaId, dataInicio, dataFim, negocioId, safraId, authentication.getName()));
+        return ResponseEntity.ok(transacaoService.buscarResumo(fazendaId, dataInicio, dataFim, negocioId, safraId, projetoId, authentication.getName()));
     }
 
     @GetMapping("/negocio/{negocioId}/resumo")
@@ -100,6 +103,16 @@ public class TransacaoController {
             Authentication authentication) {
         String numeroUsuarioLogado = authentication.getName();
         return ResponseEntity.ok(transacaoService.buscarResumoPorNegocio(negocioId, dataInicio, dataFim, numeroUsuarioLogado));
+    }
+
+    @GetMapping("/projeto/{projetoId}/resumo")
+    public ResponseEntity<ResumoFinanceiroResponse> buscarResumoPorProjeto(
+            @PathVariable Long projetoId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+            Authentication authentication) {
+        String numeroUsuarioLogado = authentication.getName();
+        return ResponseEntity.ok(transacaoService.buscarResumoPorProjeto(projetoId, dataInicio, dataFim, numeroUsuarioLogado));
     }
 
     @PatchMapping("/{id}/reativar")

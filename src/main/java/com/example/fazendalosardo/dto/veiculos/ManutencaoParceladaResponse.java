@@ -21,7 +21,8 @@ public record ManutencaoParceladaResponse(
 ) {
     public static ManutencaoParceladaResponse de(ManutencaoParcelada m) {
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
-                : m.getSafra() != null ? m.getSafra().getNome() : null;
+                : m.getSafra() != null ? m.getSafra().getNome()
+                : m.getProjeto() != null ? m.getProjeto().getNome() : null;
         return new ManutencaoParceladaResponse(
                 m.getId(),
                 m.getVeiculo() != null ? m.getVeiculo().getId() : null,

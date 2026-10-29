@@ -14,6 +14,7 @@ public record ContaFornecedorRequest(
         @NotNull LocalDate data,
         @NotNull @Positive BigDecimal valor,
         Long negocioId,
-        Long safraId
+        Long safraId,
+        Long projetoId
 ) {
 }

@@ -60,9 +60,10 @@ public class ManutencaoParceladaServiceImpl implements ManutencaoParceladaServic
         Fornecedor fornecedor = fornecedorRepository.findById(request.fornecedorId())
                 .orElseThrow(() -> new NotFoundException("Fornecedor não encontrado"));
 
-        helper.validarVinculoXor(request.negocioId(), request.safraId());
+        helper.validarVinculoXor(request.negocioId(), request.safraId(), request.projetoId());
         Negocio negocio = helper.buscarNegocio(request.negocioId());
         Safra safra = helper.buscarSafra(request.safraId());
+        Projeto projeto = helper.buscarProjeto(request.projetoId());
 
         if (request.valoresParcelas() == null || request.valoresParcelas().isEmpty()) {
             throw new BusinessException("Informe ao menos uma parcela");
@@ -83,6 +84,7 @@ public class ManutencaoParceladaServiceImpl implements ManutencaoParceladaServic
         manutencao.setFornecedor(fornecedor);
         manutencao.setNegocio(negocio);
         manutencao.setSafra(safra);
+        manutencao.setProjeto(projeto);
         manutencao.setAtivo(true);
         manutencao.setParcelas(gerarParcelas(manutencao, request.valoresParcelas(), request.primeiraDataVencimento()));
 
@@ -130,7 +132,8 @@ public class ManutencaoParceladaServiceImpl implements ManutencaoParceladaServic
                 descricaoBase, ativoNome, parcela.getNumeroParcela(), manutencao.getNumeroParcelas());
 
         Transacao transacao = helper.gerarTransacaoGasto(
-                manutencao.getFazenda(), manutencao.getNegocio(), manutencao.getSafra(), parcela.getValor(), dataEfetiva, descricao);
+                manutencao.getFazenda(), manutencao.getNegocio(), manutencao.getSafra(), manutencao.getProjeto(),
+                parcela.getValor(), dataEfetiva, descricao);
 
         parcela.setTransacao(transacao);
         parcela.setStatus(StatusParcela.BAIXADO);

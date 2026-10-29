@@ -19,6 +19,7 @@ public record AbastecimentoRequest(
         String observacao,
         @NotNull Long fazendaId,
         Long negocioId,
-        Long safraId
+        Long safraId,
+        Long projetoId
 ) {
 }

@@ -37,13 +37,14 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
     @Override
     public AbastecimentoResponse salvar(AbastecimentoRequest request, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaAcessoHelper.buscarComAcesso(request.fazendaId(), numeroUsuarioLogado);
-        helper.validarVinculoXor(request.negocioId(), request.safraId());
+        helper.validarVinculoXor(request.negocioId(), request.safraId(), request.projetoId());
 
         Veiculo veiculo = veiculoRepository.findById(request.veiculoId())
                 .orElseThrow(() -> new NotFoundException("Veículo não encontrado"));
 
         Negocio negocio = helper.buscarNegocio(request.negocioId());
         Safra safra = helper.buscarSafra(request.safraId());
+        Projeto projeto = helper.buscarProjeto(request.projetoId());
 
         Abastecimento abastecimento = new Abastecimento();
         abastecimento.setVeiculo(veiculo);
@@ -55,11 +56,12 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         abastecimento.setFazenda(fazenda);
         abastecimento.setNegocio(negocio);
         abastecimento.setSafra(safra);
+        abastecimento.setProjeto(projeto);
         abastecimento.setAtivo(true);
 
         switch (request.localAbastecimento()) {
-            case POSTO_CASUAL -> processarPostoCasual(abastecimento, request, veiculo, fazenda, negocio, safra);
-            case ESTOQUE_FAZENDA -> processarEstoqueFazenda(abastecimento, request, veiculo, fazenda, negocio, safra);
+            case POSTO_CASUAL -> processarPostoCasual(abastecimento, request, veiculo, fazenda, negocio, safra, projeto);
+            case ESTOQUE_FAZENDA -> processarEstoqueFazenda(abastecimento, request, veiculo, fazenda, negocio, safra, projeto);
             case POSTO_CREDENCIADO -> processarPostoCredenciado(abastecimento, request);
         }
 
@@ -67,13 +69,13 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
     }
 
     private void processarPostoCasual(Abastecimento abastecimento, AbastecimentoRequest request, Veiculo veiculo,
-                                      Fazenda fazenda, Negocio negocio, Safra safra) {
+                                      Fazenda fazenda, Negocio negocio, Safra safra, Projeto projeto) {
         if (request.valorPorLitro() == null || request.valorPorLitro().signum() <= 0) {
             throw new BusinessException("Informe o valor por litro pago no posto casual");
         }
         BigDecimal valorTotal = request.litros().multiply(request.valorPorLitro());
         String descricao = "Abastecimento - %s (%s)".formatted(veiculo.getNome(), formatarCombustivel(request.tipoCombustivel()));
-        Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, valorTotal, request.data(), descricao);
+        Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, projeto, valorTotal, request.data(), descricao);
 
         abastecimento.setValorPorLitro(request.valorPorLitro());
         abastecimento.setValorTotal(valorTotal);
@@ -83,21 +85,21 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
 
     @Override
     public Page<AbastecimentoResponse> buscarPorFazenda(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
-                                                        Long negocioId, Long safraId, Pageable pageable, String numeroUsuarioLogado) {
+                                                        Long negocioId, Long safraId, Long projetoId, Pageable pageable, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
-        return abastecimentoRepository.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, pageable)
+        return abastecimentoRepository.buscarPorFazenda(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, projetoId, pageable)
                 .map(AbastecimentoResponse::de);
     }
 
     @Override
     public AbastecimentoResumoResponse buscarResumo(Long fazendaId, Long veiculoId, LocalDate dataInicio, LocalDate dataFim,
-                                                    Long negocioId, Long safraId, String numeroUsuarioLogado) {
+                                                    Long negocioId, Long safraId, Long projetoId, String numeroUsuarioLogado) {
         fazendaAcessoHelper.buscarComAcesso(fazendaId, numeroUsuarioLogado);
-        return abastecimentoRepository.buscarResumo(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId);
+        return abastecimentoRepository.buscarResumo(fazendaId, veiculoId, dataInicio, dataFim, negocioId, safraId, projetoId);
     }
 
     private void processarEstoqueFazenda(Abastecimento abastecimento, AbastecimentoRequest request, Veiculo veiculo,
-                                         Fazenda fazenda, Negocio negocio, Safra safra) {
+                                         Fazenda fazenda, Negocio negocio, Safra safra, Projeto projeto) {
         EstoqueCombustivel estoque = estoqueCombustivelRepository
                 .findByFazendaIdAndTipoCombustivel(fazenda.getId(), request.tipoCombustivel())
                 .orElseThrow(() -> new BusinessException("Não há estoque cadastrado para esse combustível"));
@@ -116,7 +118,7 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
 
         BigDecimal valorTotal = request.litros().multiply(valorPorLitroRef);
         String descricao = "Abastecimento (estoque) - %s (%s)".formatted(veiculo.getNome(), formatarCombustivel(request.tipoCombustivel()));
-        Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, valorTotal, request.data(), descricao);
+        Transacao transacao = helper.gerarTransacaoGasto(fazenda, negocio, safra, projeto, valorTotal, request.data(), descricao);
 
         abastecimento.setValorPorLitro(valorPorLitroRef);
         abastecimento.setValorTotal(valorTotal);
@@ -182,7 +184,7 @@ public class AbastecimentoServiceImpl implements AbastecimentoService {
         String descricao = "Pagamento posto - %s (abastecimento de %s)"
                 .formatted(posto.getNome(), abastecimento.getVeiculo().getNome());
         Transacao transacao = helper.gerarTransacaoGasto(fazenda, abastecimento.getNegocio(), abastecimento.getSafra(),
-                abastecimento.getValorTotal(), dataEfetiva, descricao);
+                abastecimento.getProjeto(), abastecimento.getValorTotal(), dataEfetiva, descricao);
 
         abastecimento.setTransacao(transacao);
         abastecimento.setStatusPagamento(StatusParcela.BAIXADO);

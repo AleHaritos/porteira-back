@@ -71,6 +71,10 @@ public class Abastecimento {
     @JoinColumn(name = "safra_id")
     private Safra safra;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projeto_id")
+    private Projeto projeto;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status_pagamento", nullable = false, length = 20)
     private StatusParcela statusPagamento = StatusParcela.BAIXADO;

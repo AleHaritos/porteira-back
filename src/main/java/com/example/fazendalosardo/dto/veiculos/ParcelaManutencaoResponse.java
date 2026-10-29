@@ -25,7 +25,8 @@ public record ParcelaManutencaoResponse(
     public static ParcelaManutencaoResponse de(ParcelaManutencao p) {
         ManutencaoParcelada m = p.getManutencaoParcelada();
         String vinculo = m.getNegocio() != null ? m.getNegocio().getNome()
-                : m.getSafra() != null ? m.getSafra().getNome() : null;
+                : m.getSafra() != null ? m.getSafra().getNome()
+                : m.getProjeto() != null ? m.getProjeto().getNome() : null;
         String ativoNome = m.getVeiculo() != null ? m.getVeiculo().getNome() : m.getEquipamento().getNome();
         return new ParcelaManutencaoResponse(
                 p.getId(), p.getNumeroParcela(), m.getNumeroParcelas(), p.getValor(), p.getDataVencimento(),

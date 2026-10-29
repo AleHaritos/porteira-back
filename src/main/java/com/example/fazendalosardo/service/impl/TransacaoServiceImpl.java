@@ -8,12 +8,14 @@ import com.example.fazendalosardo.exception.BusinessException;
 import com.example.fazendalosardo.mapper.TransacaoMapper;
 import com.example.fazendalosardo.model.Fazenda;
 import com.example.fazendalosardo.model.Negocio;
+import com.example.fazendalosardo.model.Projeto;
 import com.example.fazendalosardo.model.Transacao;
 import com.example.fazendalosardo.model.enums.TipoTransacao;
 import com.example.fazendalosardo.model.safras.Safra;
 import com.example.fazendalosardo.repository.FazendaColaboradorRepository;
 import com.example.fazendalosardo.repository.FazendaRepository;
 import com.example.fazendalosardo.repository.NegocioRepository;
+import com.example.fazendalosardo.repository.ProjetoRepository;
 import com.example.fazendalosardo.repository.financeiro.TransacaoRepository;
 import com.example.fazendalosardo.repository.safras.SafraRepository;
 import com.example.fazendalosardo.service.TransacaoService;
@@ -35,6 +37,7 @@ public class TransacaoServiceImpl implements TransacaoService {
     private final FazendaRepository fazendaRepository;
     private final NegocioRepository negocioRepository;
     private final SafraRepository safraRepository;
+    private final ProjetoRepository projetoRepository;
     private final FazendaColaboradorRepository fazendaColaboradorRepository;
     private final TransacaoMapper transacaoMapper;
 
@@ -45,12 +48,13 @@ public class TransacaoServiceImpl implements TransacaoService {
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
 
         validarAcesso(fazenda, numeroUsuarioLogado);
-        validarVinculo(request.negocioId(), request.safraId());
+        validarVinculo(request.negocioId(), request.safraId(), request.projetoId());
+        validarTipoParaProjeto(request.projetoId(), request.tipo());
 
         Transacao transacao = transacaoMapper.toEntity(request);
         transacao.setAtivo(true);
         transacao.setFazenda(fazenda);
-        vincularNegocioOuSafra(transacao, request.negocioId(), request.safraId(), fazenda);
+        vincularNegocioSafraOuProjeto(transacao, request.negocioId(), request.safraId(), request.projetoId(), fazenda);
 
         transacao = transacaoRepository.save(transacao);
         return transacaoMapper.toResponse(transacao);
@@ -58,13 +62,13 @@ public class TransacaoServiceImpl implements TransacaoService {
 
     @Override
     public Page<TransacaoResponse> buscarPorFazenda(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                                    TipoTransacao tipo, Long negocioId, Long safraId,
+                                                    TipoTransacao tipo, Long negocioId, Long safraId, Long projetoId,
                                                     Pageable pageable, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaRepository.findById(fazendaId)
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
         validarAcesso(fazenda, numeroUsuarioLogado);
 
-        return transacaoRepository.buscarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, pageable)
+        return transacaoRepository.buscarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, projetoId, pageable)
                 .map(transacaoMapper::toResponse);
     }
 
@@ -75,10 +79,11 @@ public class TransacaoServiceImpl implements TransacaoService {
                 .orElseThrow(() -> new BusinessException("Transação não encontrada"));
 
         validarAcesso(transacao.getFazenda(), numeroUsuarioLogado);
-        validarVinculo(request.negocioId(), request.safraId());
+        validarVinculo(request.negocioId(), request.safraId(), request.projetoId());
+        validarTipoParaProjeto(request.projetoId(), request.tipo());
 
         transacaoMapper.atualizar(request, transacao);
-        vincularNegocioOuSafra(transacao, request.negocioId(), request.safraId(), transacao.getFazenda());
+        vincularNegocioSafraOuProjeto(transacao, request.negocioId(), request.safraId(), request.projetoId(), transacao.getFazenda());
 
         transacao = transacaoRepository.save(transacao);
         return transacaoMapper.toResponse(transacao);
@@ -86,12 +91,12 @@ public class TransacaoServiceImpl implements TransacaoService {
 
     @Override
     public List<TransacaoResponse> listarComFiltros(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                                    TipoTransacao tipo, Long negocioId, Long safraId, String numeroUsuarioLogado) {
+                                                    TipoTransacao tipo, Long negocioId, Long safraId, Long projetoId, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaRepository.findById(fazendaId)
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
         validarAcesso(fazenda, numeroUsuarioLogado);
 
-        return transacaoRepository.listarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId)
+        return transacaoRepository.listarComFiltros(fazendaId, dataInicio, dataFim, tipo, negocioId, safraId, projetoId)
                 .stream().map(transacaoMapper::toResponse).toList();
     }
 
@@ -107,11 +112,11 @@ public class TransacaoServiceImpl implements TransacaoService {
 
     @Override
     public ResumoFinanceiroResponse buscarResumo(Long fazendaId, LocalDate dataInicio, LocalDate dataFim,
-                                                 Long negocioId, Long safraId, String numeroUsuarioLogado) {
+                                                 Long negocioId, Long safraId, Long projetoId, String numeroUsuarioLogado) {
         Fazenda fazenda = fazendaRepository.findById(fazendaId)
                 .orElseThrow(() -> new BusinessException("Fazenda não encontrada"));
         validarAcesso(fazenda, numeroUsuarioLogado);
-        return transacaoRepository.buscarResumo(fazendaId, dataInicio, dataFim, negocioId, safraId);
+        return transacaoRepository.buscarResumo(fazendaId, dataInicio, dataFim, negocioId, safraId, projetoId);
     }
 
     @Override
@@ -122,6 +127,16 @@ public class TransacaoServiceImpl implements TransacaoService {
         validarAcesso(negocio.getFazenda(), numeroUsuarioLogado);
 
         return transacaoRepository.buscarResumoPorNegocio(negocioId, dataInicio, dataFim);
+    }
+
+    @Override
+    public ResumoFinanceiroResponse buscarResumoPorProjeto(Long projetoId, LocalDate dataInicio, LocalDate dataFim, String numeroUsuarioLogado) {
+        Projeto projeto = projetoRepository.findById(projetoId)
+                .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado"));
+
+        validarAcesso(projeto.getFazenda(), numeroUsuarioLogado);
+
+        return transacaoRepository.buscarResumoPorProjeto(projetoId, dataInicio, dataFim);
     }
 
     @Override
@@ -153,16 +168,25 @@ public class TransacaoServiceImpl implements TransacaoService {
         }
     }
 
-    private void validarVinculo(Long negocioId, Long safraId) {
-        boolean temNegocio = negocioId != null;
-        boolean temSafra = safraId != null;
-        if (temNegocio == temSafra) {
+    private void validarVinculo(Long negocioId, Long safraId, Long projetoId) {
+        int quantidade = 0;
+        if (negocioId != null) quantidade++;
+        if (safraId != null) quantidade++;
+        if (projetoId != null) quantidade++;
+
+        if (quantidade != 1) {
             throw new BusinessException(
-                    "A transação deve estar vinculada a exatamente um Negócio ou uma Safra, nunca os dois ou nenhum");
+                    "A transação deve estar vinculada a exatamente um Negócio, uma Safra ou um Projeto, nunca mais de um ou nenhum");
         }
     }
 
-    private void vincularNegocioOuSafra(Transacao transacao, Long negocioId, Long safraId, Fazenda fazenda) {
+    private void validarTipoParaProjeto(Long projetoId, TipoTransacao tipo) {
+        if (projetoId != null && tipo != TipoTransacao.GASTO) {
+            throw new BusinessException("Transações vinculadas a um Projeto só podem ser do tipo Gasto");
+        }
+    }
+
+    private void vincularNegocioSafraOuProjeto(Transacao transacao, Long negocioId, Long safraId, Long projetoId, Fazenda fazenda) {
         if (negocioId != null) {
             Negocio negocio = negocioRepository.findById(negocioId)
                     .orElseThrow(() -> new BusinessException("Negócio não encontrado"));
@@ -171,7 +195,8 @@ public class TransacaoServiceImpl implements TransacaoService {
             }
             transacao.setNegocio(negocio);
             transacao.setSafra(null);
-        } else {
+            transacao.setProjeto(null);
+        } else if (safraId != null) {
             Safra safra = safraRepository.findById(safraId)
                     .orElseThrow(() -> new BusinessException("Safra não encontrada"));
             if (!safra.getFazenda().getId().equals(fazenda.getId())) {
@@ -179,6 +204,16 @@ public class TransacaoServiceImpl implements TransacaoService {
             }
             transacao.setNegocio(null);
             transacao.setSafra(safra);
+            transacao.setProjeto(null);
+        } else {
+            Projeto projeto = projetoRepository.findById(projetoId)
+                    .orElseThrow(() -> new BusinessException("Projeto não encontrado"));
+            if (!projeto.getFazenda().getId().equals(fazenda.getId())) {
+                throw new BusinessException("O projeto informado não pertence a essa fazenda");
+            }
+            transacao.setNegocio(null);
+            transacao.setSafra(null);
+            transacao.setProjeto(projeto);
         }
     }
 }

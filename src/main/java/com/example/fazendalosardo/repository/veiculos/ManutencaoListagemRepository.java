@@ -21,7 +21,7 @@ public class ManutencaoListagemRepository {
             SELECT 'SIMPLES' AS origem, m.id AS id, v.nome AS ativo_nome, m.tipo AS tipo,
                    m.descricao AS descricao, m.data AS data, m.valor AS valor, m.km_atual AS km_atual,
                    m.forma_pagamento AS forma_pagamento, f.nome AS fornecedor_nome,
-                   COALESCE(n.nome, s.nome) AS vinculo_nome,
+                   COALESCE(n.nome, s.nome, pr.nome) AS vinculo_nome,
                    m.status_pagamento AS status_pagamento, m.data_baixa AS data_baixa,
                    CAST(NULL AS integer) AS numero_parcela, CAST(NULL AS integer) AS total_parcelas
             FROM manutencoes m
@@ -29,6 +29,7 @@ public class ManutencaoListagemRepository {
             LEFT JOIN fornecedores f ON f.id = m.fornecedor_id
             LEFT JOIN negocio n ON n.id = m.negocio_id
             LEFT JOIN safras s ON s.id = m.safra_id
+            LEFT JOIN projeto pr ON pr.id = m.projeto_id
             WHERE m.fazenda_id = ? AND m.ativo = true
               AND (CAST(? AS bigint) IS NULL OR m.veiculo_id = ?)
               AND (CAST(? AS date) IS NULL OR m.data >= ?)
@@ -39,7 +40,7 @@ public class ManutencaoListagemRepository {
             SELECT 'PARCELA' AS origem, p.id AS id, v2.nome AS ativo_nome, mp.tipo AS tipo,
                    mp.descricao AS descricao, p.data_vencimento AS data, p.valor AS valor, mp.km_atual AS km_atual,
                    'FORNECEDOR_CREDENCIADO' AS forma_pagamento, fo.nome AS fornecedor_nome,
-                   COALESCE(n2.nome, s2.nome) AS vinculo_nome,
+                   COALESCE(n2.nome, s2.nome, pr2.nome) AS vinculo_nome,
                    p.status AS status_pagamento, p.data_baixa AS data_baixa,
                    p.numero_parcela AS numero_parcela, mp.numero_parcelas AS total_parcelas
             FROM parcelas_manutencao p
@@ -48,6 +49,7 @@ public class ManutencaoListagemRepository {
             JOIN fornecedores fo ON fo.id = mp.fornecedor_id
             LEFT JOIN negocio n2 ON n2.id = mp.negocio_id
             LEFT JOIN safras s2 ON s2.id = mp.safra_id
+            LEFT JOIN projeto pr2 ON pr2.id = mp.projeto_id
             WHERE mp.fazenda_id = ? AND mp.ativo = true AND mp.veiculo_id IS NOT NULL
               AND (CAST(? AS bigint) IS NULL OR mp.veiculo_id = ?)
               AND (CAST(? AS date) IS NULL OR p.data_vencimento >= ?)
@@ -58,7 +60,7 @@ public class ManutencaoListagemRepository {
             SELECT 'SIMPLES' AS origem, m.id AS id, e.nome AS ativo_nome, m.tipo AS tipo,
                    m.descricao AS descricao, m.data AS data, m.valor AS valor, CAST(NULL AS integer) AS km_atual,
                    m.forma_pagamento AS forma_pagamento, f.nome AS fornecedor_nome,
-                   COALESCE(n.nome, s.nome) AS vinculo_nome,
+                   COALESCE(n.nome, s.nome, pr.nome) AS vinculo_nome,
                    m.status_pagamento AS status_pagamento, m.data_baixa AS data_baixa,
                    CAST(NULL AS integer) AS numero_parcela, CAST(NULL AS integer) AS total_parcelas
             FROM manutencoes_equipamento m
@@ -66,6 +68,7 @@ public class ManutencaoListagemRepository {
             LEFT JOIN fornecedores f ON f.id = m.fornecedor_id
             LEFT JOIN negocio n ON n.id = m.negocio_id
             LEFT JOIN safras s ON s.id = m.safra_id
+            LEFT JOIN projeto pr ON pr.id = m.projeto_id
             WHERE m.fazenda_id = ? AND m.ativo = true
               AND (CAST(? AS bigint) IS NULL OR m.equipamento_id = ?)
               AND (CAST(? AS date) IS NULL OR m.data >= ?)
@@ -76,7 +79,7 @@ public class ManutencaoListagemRepository {
             SELECT 'PARCELA' AS origem, p.id AS id, e2.nome AS ativo_nome, mp.tipo AS tipo,
                    mp.descricao AS descricao, p.data_vencimento AS data, p.valor AS valor, CAST(NULL AS integer) AS km_atual,
                    'FORNECEDOR_CREDENCIADO' AS forma_pagamento, fo.nome AS fornecedor_nome,
-                   COALESCE(n2.nome, s2.nome) AS vinculo_nome,
+                   COALESCE(n2.nome, s2.nome, pr2.nome) AS vinculo_nome,
                    p.status AS status_pagamento, p.data_baixa AS data_baixa,
                    p.numero_parcela AS numero_parcela, mp.numero_parcelas AS total_parcelas
             FROM parcelas_manutencao p
@@ -85,6 +88,7 @@ public class ManutencaoListagemRepository {
             JOIN fornecedores fo ON fo.id = mp.fornecedor_id
             LEFT JOIN negocio n2 ON n2.id = mp.negocio_id
             LEFT JOIN safras s2 ON s2.id = mp.safra_id
+            LEFT JOIN projeto pr2 ON pr2.id = mp.projeto_id
             WHERE mp.fazenda_id = ? AND mp.ativo = true AND mp.equipamento_id IS NOT NULL
               AND (CAST(? AS bigint) IS NULL OR mp.equipamento_id = ?)
               AND (CAST(? AS date) IS NULL OR p.data_vencimento >= ?)

@@ -26,7 +26,8 @@ public record AbastecimentoResponse(
 ) {
     public static AbastecimentoResponse de(Abastecimento a) {
         String vinculo = a.getNegocio() != null ? a.getNegocio().getNome()
-                : a.getSafra() != null ? a.getSafra().getNome() : null;
+                : a.getSafra() != null ? a.getSafra().getNome()
+                : a.getProjeto() != null ? a.getProjeto().getNome() : null;
         return new AbastecimentoResponse(a.getId(), a.getVeiculo().getId(), a.getVeiculo().getNome(),
                 a.getData(), a.getLitros(), a.getValorPorLitro(), a.getValorTotal(),
                 a.getTipoCombustivel(), a.getLocalAbastecimento(),
