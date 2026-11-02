@@ -30,6 +30,10 @@ public class CustoFixoTalhao {
     @Column(name = "valor", precision = 12, scale = 2, nullable = false)
     private BigDecimal valor;
 
+
+    @Column(name = "arrendo", nullable = false)
+    private boolean arrendo;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "talhao_id", nullable = false)
     private Talhao talhao;

@@ -20,8 +20,16 @@ public interface ManutencaoEquipamentoRepository extends JpaRepository<Manutenca
     @Query("SELECT m FROM ManutencaoEquipamento m WHERE m.fornecedor.id = :fornecedorId AND m.statusPagamento = :status AND m.ativo = true ORDER BY m.data DESC")
     List<ManutencaoEquipamento> listarPendentesPorFornecedor(@Param("fornecedorId") Long fornecedorId, @Param("status") StatusParcela status);
 
-    @Query("SELECT COALESCE(SUM(m.valor), 0) FROM ManutencaoEquipamento m WHERE m.safra.id = :safraId AND m.ativo = true")
-    BigDecimal somarValorPorSafra(@Param("safraId") Long safraId);
+    @Query("""
+        SELECT COALESCE(SUM(m.valor), 0) FROM ManutencaoEquipamento m
+        WHERE m.safra.id = :safraId
+          AND m.ativo = true
+          AND (CAST(:dataInicio AS date) IS NULL OR m.data >= :dataInicio)
+          AND (CAST(:dataFim AS date) IS NULL OR m.data <= :dataFim)
+        """)
+    BigDecimal somarValorPorSafraEPeriodo(@Param("safraId") Long safraId,
+                                          @Param("dataInicio") LocalDate dataInicio,
+                                          @Param("dataFim") LocalDate dataFim);
 
     @Query("""
         SELECT m FROM ManutencaoEquipamento m

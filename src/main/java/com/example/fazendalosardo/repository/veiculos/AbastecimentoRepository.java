@@ -82,6 +82,14 @@ public interface AbastecimentoRepository extends JpaRepository<Abastecimento, Lo
                                              @Param("safraId") Long safraId,
                                              @Param("projetoId") Long projetoId);
 
-    @Query("SELECT COALESCE(SUM(a.valorTotal), 0) FROM Abastecimento a WHERE a.safra.id = :safraId AND a.ativo = true")
-    BigDecimal somarValorPorSafra(@Param("safraId") Long safraId);
+    @Query("""
+        SELECT COALESCE(SUM(a.valorTotal), 0) FROM Abastecimento a
+        WHERE a.safra.id = :safraId
+          AND a.ativo = true
+          AND (CAST(:dataInicio AS date) IS NULL OR a.data >= :dataInicio)
+          AND (CAST(:dataFim AS date) IS NULL OR a.data <= :dataFim)
+        """)
+    BigDecimal somarValorPorSafraEPeriodo(@Param("safraId") Long safraId,
+                                          @Param("dataInicio") LocalDate dataInicio,
+                                          @Param("dataFim") LocalDate dataFim);
 }

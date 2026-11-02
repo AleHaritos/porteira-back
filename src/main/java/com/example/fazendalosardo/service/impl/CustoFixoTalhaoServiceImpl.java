@@ -31,6 +31,7 @@ public class CustoFixoTalhaoServiceImpl implements CustoFixoTalhaoService {
         custo.setTalhao(talhao);
         custo.setDescricao(request.descricao());
         custo.setValor(request.valor());
+        custo.setArrendo(request.arrendo() != null && request.arrendo());
 
         return CustoFixoTalhaoResponse.de(custoFixoTalhaoRepository.save(custo));
     }

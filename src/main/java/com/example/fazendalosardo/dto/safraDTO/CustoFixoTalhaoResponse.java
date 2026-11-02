@@ -8,9 +8,16 @@ public record CustoFixoTalhaoResponse(
         Long id,
         Long talhaoId,
         String descricao,
-        BigDecimal valor
+        BigDecimal valor,
+        boolean arrendo
 ) {
-    public static CustoFixoTalhaoResponse de(CustoFixoTalhao c) {
-        return new CustoFixoTalhaoResponse(c.getId(), c.getTalhao().getId(), c.getDescricao(), c.getValor());
+    public static CustoFixoTalhaoResponse de(CustoFixoTalhao custo) {
+        return new CustoFixoTalhaoResponse(
+                custo.getId(),
+                custo.getTalhao().getId(),
+                custo.getDescricao(),
+                custo.getValor(),
+                custo.isArrendo()
+        );
     }
 }

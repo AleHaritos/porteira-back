@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 public record CustoFixoTalhaoRequest(
         @NotNull Long talhaoId,
         @NotBlank String descricao,
-        @NotNull @Positive BigDecimal valor
+        @NotNull @Positive BigDecimal valor,
+        Boolean arrendo
 ) {
 }

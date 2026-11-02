@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +22,11 @@ public class CustoCategoriaSafraServiceImpl implements CustoCategoriaSafraServic
 
     @Override
     @Transactional(readOnly = true)
-    public CustosCombustivelManutencaoResponse buscarPorSafra(Long safraId) {
-        BigDecimal totalCombustivel = abastecimentoRepository.somarValorPorSafra(safraId);
+    public CustosCombustivelManutencaoResponse buscarPorSafra(Long safraId, LocalDate dataInicio, LocalDate dataFim) {
+        BigDecimal totalCombustivel = abastecimentoRepository.somarValorPorSafraEPeriodo(safraId, dataInicio, dataFim);
 
-        BigDecimal totalManutencao = manutencaoRepository.somarValorPorSafra(safraId)
-                .add(manutencaoEquipamentoRepository.somarValorPorSafra(safraId));
+        BigDecimal totalManutencao = manutencaoRepository.somarValorPorSafraEPeriodo(safraId, dataInicio, dataFim)
+                .add(manutencaoEquipamentoRepository.somarValorPorSafraEPeriodo(safraId, dataInicio, dataFim));
 
         return new CustosCombustivelManutencaoResponse(totalCombustivel, totalManutencao);
     }
